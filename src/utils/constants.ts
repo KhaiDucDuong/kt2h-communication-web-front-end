@@ -1,0 +1,1 @@
+// do not store sensitive here such as api paths or keys, put those in .env files
