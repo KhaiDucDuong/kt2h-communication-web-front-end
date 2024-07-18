@@ -13,8 +13,8 @@ function CustomIcon(props: {
 
   return (
     <div
-      className={clsx("w-full h-[108px] flex justify-center hover:cursor-pointer", {
-        "bg-dark-100": props.isSelected === true || isHovered === true,
+      className={clsx("w-full h-[64px] flex justify-center hover:cursor-pointer", {
+        "bg-dark-1": props.isSelected === true || isHovered === true,
       })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
