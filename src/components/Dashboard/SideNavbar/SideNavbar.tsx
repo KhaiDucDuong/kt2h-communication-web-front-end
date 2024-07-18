@@ -14,7 +14,7 @@ import Link from "next/link";
 const SideNavbar = () => {
   const pathname = usePathname();
   return (
-    <nav className="w-[64px] min-h-screen bg-dark-10">
+    <nav className="min-w-[64px] min-h-screen bg-dark-10">
       <div className="flex flex-col justify-between h-full">
         <div>
           <Link href="/profile">
