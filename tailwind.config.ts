@@ -31,6 +31,9 @@ const config = {
           "2": "#353535",
           "1": "#383838",
         },
+        gray: {
+          "1": "#A0A0A0",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
