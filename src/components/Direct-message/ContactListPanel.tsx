@@ -8,7 +8,7 @@ const ContactListPanel = () => {
         <SearchBar />
         <div className="relative flex w-full border-dark-10 border-[1px] "></div>
       </div>
-      <div className="pt-[2px]">
+      <div className="pt-[2px] size-full px-[7px]">
         <ContactList />
       </div>
     </section>
