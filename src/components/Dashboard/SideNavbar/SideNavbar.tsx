@@ -14,14 +14,14 @@ import Link from "next/link";
 const SideNavbar = () => {
   const pathname = usePathname();
   return (
-    <nav className="w-[64px] min-h-screen bg-dark-10">
+    <nav className="min-w-[64px] min-h-screen bg-dark-10">
       <div className="flex flex-col justify-between h-full">
         <div>
           <Link href="/profile">
             <div className="text-white w-full h-[100px] flex justify-center">
               <Image
                 className="rounded-full m-auto border-2 hover:cursor-pointer"
-                src="/assets/images/profile-pic.jpg"
+                src="/assets/images/khai.jpg"
                 width={48}
                 height={48}
                 alt="User's profile picture"
