@@ -14,5 +14,5 @@ export function middleware(request: NextRequest) {
 
   export const config = {
     //urls that go through middleware
-    matcher: ['/profile', '/account/settings'],
+    matcher: ['/sign-in', '/sign-up', '/forgot-password'],
   }
