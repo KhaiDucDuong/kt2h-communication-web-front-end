@@ -21,7 +21,7 @@ const SideNavbar = () => {
             <div className="text-white w-full h-[100px] flex justify-center">
               <Image
                 className="rounded-full m-auto border-2 hover:cursor-pointer"
-                src="/assets/images/profile-pic.jpg"
+                src="/assets/images/khai.jpg"
                 width={48}
                 height={48}
                 alt="User's profile picture"
