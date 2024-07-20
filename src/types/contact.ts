@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export interface ContactProps {
+export interface ContactProps extends ContactRow {
+  
+  className?: string;
+  handleClick: () => void;
+}
+
+export interface ContactRow {
   image: string;
   username: string;
   noMissedMessages: number;
@@ -9,7 +15,7 @@ export interface ContactProps {
   lastSent?: Date;
 }
 
-export const contactPropsSchema: z.ZodType<ContactProps> = z.object({
+export const contactRowSchema: z.ZodType<ContactRow> = z.object({
   image: z.string(),
   username: z.string(),
   noMissedMessages: z.number().min(0).max(999),
