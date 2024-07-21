@@ -1,18 +1,30 @@
-import ContactConversation from "./ContactConversation"
-import ContactMessageHeader from "./ContactMessageHeader"
+"use client"
+import { useState } from "react";
+import ContactConversation from "./ContactConversation";
+import ContactMessageHeader from "./ContactMessageHeader";
+import MoreInfoPanel from "./MoreInfoPanel";
 
 const MessagePanel = () => {
-  return (
-    <section className="flex flex-col size-full bg-dark-4">
-      <div className="h-[98px] w-[full]">
-        <ContactMessageHeader />
-      <div className="relative flex w-full border-dark-10 border-[1px] "></div>
-      </div>
-      <div className="pt-[2px] size-full max-h-[calc(100vh-98px)]">
-        <ContactConversation />
-      </div>
-    </section>
-  )
-}
+  const [isMoreInfoExpanded, setIsMoreInfoExpanded] = useState<boolean>(false)
 
-export default MessagePanel
+  return (
+    <section className="flex flex-row size-full bg-dark-4">
+      <div className="w-full">
+        <div className="h-[98px]">
+          <ContactMessageHeader profileHandleClick={()=> {}}
+            phoneHandleClick={()=> {}}
+            cameraHandleClick={()=> {}}
+            elipsisHandleClick={() => setIsMoreInfoExpanded(!isMoreInfoExpanded)}
+            isMoreInfoPannelExpanded={isMoreInfoExpanded}/>
+          <div className="relative flex  border-dark-10 border-[1px] "></div>
+        </div>
+        <div className="pt-[2px] size-full max-h-[calc(100vh-98px)]">
+          <ContactConversation />
+        </div>
+      </div>
+      <MoreInfoPanel className={isMoreInfoExpanded ? "hidden" : ""}/>
+    </section>
+  );
+};
+
+export default MessagePanel;
