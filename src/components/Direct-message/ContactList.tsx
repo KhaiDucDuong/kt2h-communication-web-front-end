@@ -8,7 +8,7 @@ const ContactList = () => {
   const [selectedContactId, setSelectedContactId] = useState<number>()
 
   return (
-    <ScrollArea className="size-full custom-scrollbar">
+    <ScrollArea className="size-full">
       {
         contacts.map( (contact) => {
           return <Contact key={contact.id} image={contact.image} username={contact.username}
