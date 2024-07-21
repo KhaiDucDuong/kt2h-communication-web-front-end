@@ -22,7 +22,7 @@ const MessagePanel = () => {
           <ContactConversation />
         </div>
       </div>
-      <MoreInfoPanel className={isMoreInfoExpanded ? "hidden" : ""}/>
+      <MoreInfoPanel className={isMoreInfoExpanded ? "" : "hidden"}/>
     </section>
   );
 };
