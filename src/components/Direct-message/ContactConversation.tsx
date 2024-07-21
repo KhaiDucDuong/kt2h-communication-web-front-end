@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import ConversationMessage from "./ConversationMessage";
+import { conversationMessages } from "@/utils/constants";
 
 const ContactConversation = () => {
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
@@ -13,33 +14,34 @@ const ContactConversation = () => {
 
   return (
     <ScrollArea className="size-full p-[12px]">
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div>
-        <ConversationMessage />
-      </div>
-      <div ref={lastMessageRef}>
-        <ConversationMessage />
-      </div>
+      {conversationMessages.messageHistory.map(
+        (messageGroup, i, { length }) => {
+          //last element
+          if (i + 1 === length) {
+            return (
+              <div ref={lastMessageRef}>
+                <ConversationMessage
+                  sentDateTime={messageGroup.sentDateTime}
+                  fromUser={messageGroup.isSelfMessage}
+                  messages={messageGroup.messages}
+                  senderName={conversationMessages.toUserName}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div>
+                <ConversationMessage
+                  sentDateTime={messageGroup.sentDateTime}
+                  fromUser={messageGroup.isSelfMessage}
+                  messages={messageGroup.messages}
+                  senderName={conversationMessages.toUserName}
+                />
+              </div>
+            );
+          }
+        }
+      )}
     </ScrollArea>
   );
 };
