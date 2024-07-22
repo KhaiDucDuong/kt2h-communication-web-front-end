@@ -4,10 +4,10 @@ interface MoreInfoProps {
   className?: string
 }
 
-const MoreInfoPanel = (props: MoreInfoProps) => {
+const ContactMoreInfoPanel = (props: MoreInfoProps) => {
   return (
     <section className={cn("flex flex-col w-[378px] bg-dark-9 ", props.className)}>MoreInfoPanel</section>
   )
 }
 
-export default MoreInfoPanel
+export default ContactMoreInfoPanel
