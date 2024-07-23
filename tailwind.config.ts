@@ -37,10 +37,19 @@ const config = {
           "3": "#A5A5A5",
           "4": "#E4E4E4",
           "5": "#ACACAC",
-          "6": "#35393D"
+          "6": "#35393D",
+          "7": "#413D42",
+          "8": "#2C282E"
         },
         red: {
           "1": "#E93838"
+        },
+        blue: {
+          "1": "#569CFD",
+          "2": "#4A47D8"
+        },
+        purple: {
+          "1": "#5D3DD3",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
