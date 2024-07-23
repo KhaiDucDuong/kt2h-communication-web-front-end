@@ -24,8 +24,8 @@ const Contact = (props: ContactProps) => {
 
   return (
     <section
-      className={cn("h-[70px] x-full bg-dark-9 hover:bg-dark-1 hover:rounded-[8px] p-[10px] ",
-    "flex flex-row justify-between max-w-[472px] cursor-pointer ", props.className)}
+      className={cn("h-[70px] bg-dark-9 hover:bg-dark-1 hover:rounded-[8px] p-[10px] ",
+    "flex flex-row justify-between max-w-[472px] cursor-pointer", props.className)}
     onClick={props.handleClick}
     >
       <div
@@ -38,7 +38,7 @@ const Contact = (props: ContactProps) => {
             alt="contact's image"
             width={50}
             height={50}
-            className="w-[50px] h-[50px] rounded-full max-sm:w-[40px] max-sm:h-[40px]"
+            className="w-[50px] h-[50px] rounded-full"
           />
         </div>
         <div className="flex flex-col justify-between w-full max-w-[calc(100%-86px)]">

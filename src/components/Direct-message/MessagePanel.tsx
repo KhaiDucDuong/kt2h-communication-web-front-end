@@ -1,8 +1,8 @@
 "use client"
 import { useState } from "react";
-import ContactConversation from "./ContactConversation";
 import ContactMessageHeader from "./ContactMessageHeader";
-import MoreInfoPanel from "./MoreInfoPanel";
+import ContactMoreInfoPanel from "./ContactMoreInfoPanel";
+import Conversation from "../Conversation/Conversation";
 
 const MessagePanel = () => {
   const [isMoreInfoExpanded, setIsMoreInfoExpanded] = useState<boolean>(false)
@@ -19,10 +19,10 @@ const MessagePanel = () => {
           <div className="relative flex  border-dark-10 border-[1px] "></div>
         </div>
         <div className="pt-[2px] size-full max-h-[calc(100vh-98px)]">
-          <ContactConversation />
+          <Conversation />
         </div>
       </div>
-      <MoreInfoPanel className={isMoreInfoExpanded ? "" : "hidden"}/>
+      <ContactMoreInfoPanel className={isMoreInfoExpanded ? "" : "hidden"}/>
     </section>
   );
 };
