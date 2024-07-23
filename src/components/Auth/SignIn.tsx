@@ -70,7 +70,7 @@ const SignIn = () => {
         </div>
         <div className="flex flex-col flex-start">
           <label
-            htmlFor="username_email_input"
+            htmlFor="password_input"
             className="text-white inline-block mb-[8px]"
           >
             Password

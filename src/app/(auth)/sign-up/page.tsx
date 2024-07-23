@@ -1,9 +1,14 @@
-import React from 'react'
+import SignUp from "@/components/Auth/SignUp"
 
-const page = () => {
+const SignUpPage = () => {
   return (
-    <div>page</div>
+    <section
+      className=" bg-gray-8 flex flex-row justify-center
+    rounded-[15px] "
+    >
+      <SignUp />
+    </section>
   )
 }
 
-export default page
+export default SignUpPage
