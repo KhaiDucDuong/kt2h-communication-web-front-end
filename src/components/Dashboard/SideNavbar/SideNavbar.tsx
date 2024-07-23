@@ -44,14 +44,14 @@ const SideNavbar = () => {
         <DropdownMenu>
   <DropdownMenuTrigger className="outline-none">
               <Image
-                className="rounded-full m-auto border-2 hover:cursor-pointer"
+                className="rounded-full m-auto hover:cursor-pointer"
                 src="/assets/images/khai.jpg"
                 width={48}
                 height={48}
                 alt="User's profile picture"
               />
            </DropdownMenuTrigger>
-  <DropdownMenuContent  className="origin-top-left left-full ml-20 -mt-20 shadow-lg w-56" 
+  <DropdownMenuContent    className="bg-dark-9 text-gray-4 origin-top-left left-full ml-20 -mt-20 shadow-2xl w-60 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0" 
         align="end">
     <DropdownMenuLabel>My Account</DropdownMenuLabel>
     <DropdownMenuSeparator />
@@ -66,34 +66,34 @@ const SideNavbar = () => {
     <span>Sign out</span></DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
-<DialogContent>
-    <DialogHeader className="flex flex-col space-y-4 ">
+<DialogContent     className="bg-dark-9 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0">
+    <DialogHeader className="flex flex-col space-y-8">
       <DialogTitle >User profile</DialogTitle>
-      <div className="flex items-center space-x-8 mt-4">
+      <div className="flex items-center space-x-10 mt-4">
       <Image
-                className="rounded-full border-2"
+                className="rounded-full "
                 src="/assets/images/khai.jpg"
                 width={70}
                 height={70}
               />
-              <p className="font-bold">Khai Siu Vai </p>
+              <p className="font-semibold">Khai Siu Vai </p>
               </div>
     </DialogHeader>
-    <div className="flex flex-col space-y-4 mt-4">
+    <div className="flex flex-col space-y-4 mt-4 ">
     <DialogDescription className="flex items-center space-x-4">
-          <span className="font-semibold w-24">Email:</span>
-          <span className="flex-1">khaisiuvai@gmail.com</span>
+          <span className="font-semibold w-24 text-gray-2">Email:</span>
+          <span className="flex-1 text-gray-4">khaisiuvai@gmail.com</span>
         </DialogDescription>
         <DialogDescription className="flex items-center space-x-4">
-          <span className="font-semibold w-24">Phone:</span>
-          <span className="flex-1">0914712845</span>
+          <span className="font-semibold w-24 text-gray-2">Phone:</span>
+          <span className="flex-1 text-gray-4">0914712845</span>
         </DialogDescription>
         <DialogDescription className="flex items-center space-x-4">
-          <span className="font-semibold w-24">Gender:</span>
-          <span className="flex-1">Gay</span>
+          <span className="font-semibold w-24 text-gray-2">Gender:</span>
+          <span className="flex-1 text-gray-4">Gay</span>
         </DialogDescription>
         <DialogFooter>
-        <Button variant="ghost" className="hover:cursor-pointer"><UserRoundPen className="mr-2" /> Change</Button>
+        <Button variant="ghost" className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"><UserRoundPen className="mr-2" /> Change</Button>
         </DialogFooter>
         </div>
   </DialogContent>
