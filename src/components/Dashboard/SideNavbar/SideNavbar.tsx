@@ -93,7 +93,64 @@ const SideNavbar = () => {
           <span className="flex-1 text-gray-4">Gay</span>
         </DialogDescription>
         <DialogFooter>
+        <Dialog >
+        <DialogTrigger asChild className="outline-none">
         <Button variant="ghost" className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"><UserRoundPen className="mr-2" /> Change</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[500px] bg-dark-8 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0">
+        <DialogHeader >
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription className="text-gray-2">
+            Make changes to your profile here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4 mt-2">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="name" className="text-left">
+              Username
+            </label>
+            <input
+              id="name"
+              defaultValue="Pedro Duarte"
+              className="col-span-3  bg-dark-6 text-gray-4 outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="email" className="text-left">
+              Email
+            </label>
+            <input
+              id="email"
+              defaultValue="@peduarte"
+              className="col-span-3 bg-dark-6 text-gray-4 outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="phone" className="text-left">
+              Phone
+            </label>
+            <input
+              id="phone"
+              defaultValue="0914712845"
+              className="col-span-3 bg-dark-6 text-gray-4 outline-none"
+            />
+          </div>
+   <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="gender" className="text-left">
+              Gender
+            </label>
+            <input
+              id="gender"
+              defaultValue="Gay"
+              className="col-span-3 bg-dark-6 text-gray-4 outline-none"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" type="submit">Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+        </Dialog>
         </DialogFooter>
         </div>
   </DialogContent>
