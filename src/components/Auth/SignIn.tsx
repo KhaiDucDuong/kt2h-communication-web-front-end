@@ -101,7 +101,8 @@ const SignIn = () => {
             )}
             <Link href={"/forgot-password"} className="text-blue-1 hover:underline">Forgot your password?</Link>
           </div>
-          <button className="bg-blue-2 h-[40px] w-full rounded-md text-white hover:bg-purple-1 mb-[8px]">
+          <button className="bg-blue-2 h-[40px] w-full rounded-md text-white mb-[8px]
+          transition duration-150 ease-out hover:ease-in hover:bg-purple-1">
                 Login
           </button>
           <p className="text-white">Need an account? <Link href={"/sign-up"} className="text-blue-1 hover:underline">Register</Link></p>
