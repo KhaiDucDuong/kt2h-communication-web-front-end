@@ -1,20 +1,25 @@
 "use server";
 
-import { registerSchema } from "@/types/auth";
+import { loginSchema, registerSchema } from "@/types/auth";
+import { redirect } from "next/navigation";
 import { RefObject } from "react";
 
-export interface signInMessages {
-  emailErrors?: string;
-  usernameErrors?: string;
-  first_nameErrors?: string;
-  last_nameErrors?: string;
-  passwordErrors?: string;
-  confirm_passwordErrors?: string;
-  serverErrors?: [];
+export interface SignInMessages {
+  emailErrors?: string[];
+  usernameErrors?: string[];
+  first_nameErrors?: string[];
+  last_nameErrors?: string[];
+  passwordErrors?: string[];
+  confirm_passwordErrors?: string[];
+  serverErrors?: string[];
   successMessage?: "";
+  hasRegisteredAccount: boolean;
 }
 
-export async function signUp(prevState: signInMessages, formData: FormData) {
+export async function signUp(
+  prevState: SignInMessages,
+  formData: FormData
+): Promise<SignInMessages> {
   const schema = registerSchema;
 
   const data = {
@@ -37,12 +42,13 @@ export async function signUp(prevState: signInMessages, formData: FormData) {
       first_nameErrors: parseResult.first_name,
       last_nameErrors: parseResult.last_name,
       passwordErrors: parseResult.password,
-      confirm_passwordErrors: parseResult.confirmPassword,
+      confirm_passwordErrors: parseResult.confirm_password,
+      hasRegisteredAccount: false,
     };
   }
 
   const bodyData = parse.data;
-  console.log("Form data: " + bodyData);
+  console.log("Sign Up Form data: " + bodyData);
 
   try {
     const response = await fetch(`${process.env.REGISTER_API}`, {
@@ -58,10 +64,62 @@ export async function signUp(prevState: signInMessages, formData: FormData) {
     console.log("Response result: " + JSON.stringify(result));
     if (result.statusCode === 201) {
       //other logics
-      return { successMessage: result.message };
+      return { successMessage: result.message, hasRegisteredAccount: true };
     }
-    return { serverErrors: result.error };
+    return { serverErrors: result.error, hasRegisteredAccount: false };
   } catch (error) {
     console.log("Error fetching sign up: " + error);
+    return {
+      serverErrors: ["Something went wrong: " + error],
+      hasRegisteredAccount: false,
+    };
   }
+}
+
+export async function signIn(
+  prevState: { errorMessage: string },
+  formData: FormData
+): Promise<{ errorMessage: string }> {
+  const schema = loginSchema;
+
+  const data = {
+    username: formData.get("username"),
+    password: formData.get("password"),
+  };
+
+  const parse = schema.safeParse(data);
+
+  if (!parse.success) {
+    return {
+      errorMessage: "Username or password is not in the correct format",
+    };
+  }
+
+  const bodyData = parse.data;
+  console.log("Sign In Form data: " + bodyData);
+
+  let response
+  try {
+    response = await fetch(`${process.env.LOGIN_API}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyData),
+      cache: "no-cache",
+    });
+  } catch (error) {
+    console.log("Error calling sign in api: " + error);
+    return { errorMessage: "Something went wrong: " + error };
+  }
+
+  const result = await response.json();
+  console.log("Response result: " + JSON.stringify(result));
+
+  if (result.statusCode === 200) {
+    //other logics
+    redirect("/direct-message");
+  }
+
+  return { errorMessage: result.error };
 }

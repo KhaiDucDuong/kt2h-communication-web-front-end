@@ -9,5 +9,10 @@ export const registerSchema = z.object({
     confirm_password: z.string()
 }).refine((data) => data.password === data.confirm_password, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ["confirm_password"],
+})
+
+export const loginSchema = z.object({
+    username: z.string().min(5),
+    password: z.string().min(8),
 })

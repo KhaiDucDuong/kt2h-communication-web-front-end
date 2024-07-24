@@ -1,6 +1,6 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { signInMessages, signUp } from "@/services/AuthService";
+import { SignInMessages, signUp } from "@/services/AuthService";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -25,7 +25,17 @@ function SubmitButton() {
   );
 }
 
-const initialState: signInMessages = {};
+const initialState: SignInMessages = {
+  emailErrors: [],
+  usernameErrors: [],
+  first_nameErrors: [],
+  last_nameErrors: [],
+  passwordErrors: [],
+  confirm_passwordErrors: [],
+  serverErrors: [],
+  successMessage: "",
+  hasRegisteredAccount: false,
+};
 
 const SignUp = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
@@ -34,7 +44,8 @@ const SignUp = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useFormState(signUp, initialState);
 
-  if (formRef.current && state?.successMessage) {
+  if (formRef.current && state?.hasRegisteredAccount) {
+    state.hasRegisteredAccount = false;
     formRef.current.reset();
   }
 
