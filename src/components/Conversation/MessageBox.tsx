@@ -101,11 +101,17 @@ const MessageBox = () => {
                 height={24}
               />
             ) : (
-              <ThumbsUpIcon
-                className="text-gray-4 m-auto"
-                strokeWidth={1.7}
-                width={24}
-                height={24}
+              // <ThumbsUpIcon
+              //   className="text-gray-4 m-auto"
+              //   strokeWidth={1.7}
+              //   width={24}
+              //   height={24}
+              // />
+              <Image 
+              src={"/assets/images/penguin.png"}
+              width={24}
+              height={24}
+              alt="penguin icon"
               />
             )}
           </div>
