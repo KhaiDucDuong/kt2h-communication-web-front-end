@@ -119,6 +119,8 @@ export async function signIn(
   if (result.statusCode === 200) {
     //other logics
     redirect("/direct-message");
+  } else if (result.statusCode === 401){
+    return { errorMessage: "Username or password is incorrect" };
   }
 
   return { errorMessage: result.error };
