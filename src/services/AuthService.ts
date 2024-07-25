@@ -1,8 +1,8 @@
 "use server";
 
 import { loginSchema, registerSchema } from "@/types/auth";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { RefObject } from "react";
 
 export interface SignInMessages {
   emailErrors?: string[];
@@ -80,6 +80,7 @@ export async function signIn(
   prevState: { errorMessage: string },
   formData: FormData
 ): Promise<{ errorMessage: string }> {
+  const cookieStore = cookies();
   const schema = loginSchema;
 
   const data = {
@@ -98,7 +99,7 @@ export async function signIn(
   const bodyData = parse.data;
   console.log("Sign In Form data: " + bodyData);
 
-  let response
+  let response;
   try {
     response = await fetch(`${process.env.LOGIN_API}`, {
       method: "POST",
@@ -117,9 +118,41 @@ export async function signIn(
   console.log("Response result: " + JSON.stringify(result));
 
   if (result.statusCode === 200) {
-    //other logics
+    //get refresh token from response cookies and set it to next server cookie
+    const setCookies = response.headers.getSetCookie();
+    const refreshTokenExpiration = 90 * 24 * 60 * 60 * 1000 //90 days
+    setCookies.forEach((cookie) => {
+      cookie.match("refresh_token=");
+      const refreshTokenValue = cookie.split("refresh_token=")[1];
+      cookieStore.set({
+        name: "refresh_token",
+        value: refreshTokenValue,
+        httpOnly: true,
+        sameSite: "strict",
+        secure: true,
+        expires: Date.now() + refreshTokenExpiration
+      });
+
+      const accessTokenExpiration = 10 * 60 * 1000 //10 minutes
+      cookieStore.set({
+        name: "access_token",
+        value: result.data.access_token,
+        httpOnly: true,
+        sameSite: "strict",
+        secure: true,
+        expires: Date.now() + accessTokenExpiration
+      });
+
+      cookieStore.set({
+        name: "user_session",
+        value: JSON.stringify(result.data.user),
+        httpOnly: true,
+        sameSite: "strict",
+        secure: true,
+      });
+    });
     redirect("/direct-message");
-  } else if (result.statusCode === 401){
+  } else if (result.statusCode === 401) {
     return { errorMessage: "Username or password is incorrect" };
   }
 
