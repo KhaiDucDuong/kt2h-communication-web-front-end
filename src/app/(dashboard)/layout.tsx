@@ -5,11 +5,12 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   return (
-    <section className="flex flex-row min-h-screen">
-      <SideNavbar />
-      {children}
+    <section className="relative">
+      <div className="flex">
+        <SideNavbar />
+        <div className="w-full">{children}</div>
+      </div>
     </section>
   );
 }
