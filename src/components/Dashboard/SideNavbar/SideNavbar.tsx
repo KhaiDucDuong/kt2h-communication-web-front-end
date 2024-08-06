@@ -30,6 +30,7 @@ import {
   faUsers,
   faBell,
   faGear,
+  faContactBook,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { logOut } from "@/services/AuthService";
@@ -68,7 +69,10 @@ const SideNavbar = () => {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Setting</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => logOut()}>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => logOut()}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
                   </DropdownMenuItem>
@@ -194,6 +198,13 @@ const SideNavbar = () => {
               faIcon={faUsers}
               fontSize={26}
               isSelected={pathname === "/group-message" ? true : false}
+            />
+          </Link>
+          <Link href="/friends/friend-list">
+            <CustomIcon
+              faIcon={faContactBook}
+              fontSize={26}
+              isSelected={pathname.includes("/friends") ? true : false}
             />
           </Link>
           <Link href="/notifications">
