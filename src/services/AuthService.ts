@@ -4,6 +4,11 @@ import { loginSchema, registerSchema } from "@/types/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+const accessTokenCookieName="access_token"
+const refreshTokenCookieName="refresh_token"
+const userSessionCookieName="user_session"
+
+
 export interface SignInMessages {
   emailErrors?: string[];
   usernameErrors?: string[];
@@ -125,7 +130,7 @@ export async function signIn(
       cookie.match("refresh_token=");
       const refreshTokenValue = cookie.split("refresh_token=")[1];
       cookieStore.set({
-        name: "refresh_token",
+        name: refreshTokenCookieName,
         value: refreshTokenValue,
         httpOnly: true,
         sameSite: "strict",
@@ -135,7 +140,7 @@ export async function signIn(
 
       const accessTokenExpiration = 10 * 60 * 1000 //10 minutes
       cookieStore.set({
-        name: "access_token",
+        name: accessTokenCookieName,
         value: result.data.access_token,
         httpOnly: true,
         sameSite: "strict",
@@ -144,7 +149,7 @@ export async function signIn(
       });
 
       cookieStore.set({
-        name: "user_session",
+        name: userSessionCookieName,
         value: JSON.stringify(result.data.user),
         httpOnly: true,
         sameSite: "strict",
@@ -157,4 +162,12 @@ export async function signIn(
   }
 
   return { errorMessage: result.error };
+}
+
+export async function logOut(){
+  const cookieStore = cookies();
+  cookieStore.delete(refreshTokenCookieName)
+  cookieStore.delete(accessTokenCookieName)
+  cookieStore.delete(userSessionCookieName)
+  redirect("/")
 }
