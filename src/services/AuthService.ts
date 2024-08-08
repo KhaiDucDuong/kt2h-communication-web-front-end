@@ -1,13 +1,13 @@
 "use server";
 
 import { loginSchema, registerSchema } from "@/types/auth";
+import { access } from "fs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const accessTokenCookieName="access_token"
-const refreshTokenCookieName="refresh_token"
-const userSessionCookieName="user_session"
-
+const accessTokenCookieName = "access_token";
+const refreshTokenCookieName = "refresh_token";
+const userSessionCookieName = "user_session";
 
 export interface SignInMessages {
   emailErrors?: string[];
@@ -125,37 +125,17 @@ export async function signIn(
   if (result.statusCode === 200) {
     //get refresh token from response cookies and set it to next server cookie
     const setCookies = response.headers.getSetCookie();
-    const refreshTokenExpiration = 90 * 24 * 60 * 60 * 1000 //90 days
+    const refreshTokenExpiration = 90 * 24 * 60 * 60 * 1000; //90 days
     setCookies.forEach((cookie) => {
       cookie.match("refresh_token=");
       const refreshTokenValue = cookie.split("refresh_token=")[1];
-      cookieStore.set({
-        name: refreshTokenCookieName,
-        value: refreshTokenValue,
-        httpOnly: true,
-        sameSite: "strict",
-        secure: true,
-        expires: Date.now() + refreshTokenExpiration
-      });
-
-      const accessTokenExpiration = 10 * 60 * 1000 //10 minutes
-      cookieStore.set({
-        name: accessTokenCookieName,
-        value: result.data.access_token,
-        httpOnly: true,
-        sameSite: "strict",
-        secure: true,
-        expires: Date.now() + accessTokenExpiration
-      });
-
-      cookieStore.set({
-        name: userSessionCookieName,
-        value: JSON.stringify(result.data.user),
-        httpOnly: true,
-        sameSite: "strict",
-        secure: true,
-      });
+      setAuthCookies(
+        result.data.access_token,
+        refreshTokenValue,
+        JSON.stringify(result.data.user)
+      );
     });
+
     redirect("/direct-message");
   } else if (result.statusCode === 401) {
     return { errorMessage: "Username or password is incorrect" };
@@ -164,10 +144,96 @@ export async function signIn(
   return { errorMessage: result.error };
 }
 
-export async function logOut(){
+export async function logOut() {
   const cookieStore = cookies();
-  cookieStore.delete(refreshTokenCookieName)
-  cookieStore.delete(accessTokenCookieName)
-  cookieStore.delete(userSessionCookieName)
-  redirect("/")
+  cookieStore.delete(refreshTokenCookieName);
+  cookieStore.delete(accessTokenCookieName);
+  cookieStore.delete(userSessionCookieName);
+  redirect("/");
+}
+
+export async function getAccessToken() {
+  const cookieStore = cookies();
+  let accessToken = cookieStore.get("access_token");
+
+  if (accessToken === undefined) {
+    //use refresh token
+    const refreshToken = cookieStore.get("refresh_token");
+    if (refreshToken === undefined) {
+      logOut();
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.USE_REFRESH_TOKEN_API}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Cookie": `${refreshTokenCookieName}=${refreshToken?.value};`,
+        },
+        cache: "no-cache",
+      });
+
+      const result = await response.json();
+      console.log("Refresh token response result: " + JSON.stringify(result));
+      if (result.statusCode === 200) {
+        //get refresh token from response cookies and set it to next server cookie
+        const setCookies = response.headers.getSetCookie();
+        setCookies.forEach((cookie) => {
+          cookie.match("refresh_token=");
+          const refreshTokenValue = cookie.split("refresh_token=")[1];
+          setAuthCookies(
+            result.data.access_token,
+            refreshTokenValue,
+            JSON.stringify(result.data.user)
+          );
+        });
+        return result.data.access_token;
+      } else {
+        logOut();
+        return;
+      }
+    } catch (error) {
+      console.log("Error fetching using refresh token: " + error);
+      logOut();
+      return;
+    }
+  }
+
+  return accessToken?.value;
+}
+
+async function setAuthCookies(
+  accessToken: string,
+  refreshToken: string,
+  user: any
+) {
+  const cookieStore = cookies();
+  const refreshTokenExpiration = 90 * 24 * 60 * 60 * 1000; //90 days
+  cookieStore.set({
+    name: refreshTokenCookieName,
+    value: refreshToken,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+    expires: Date.now() + refreshTokenExpiration,
+  });
+
+  const accessTokenExpiration = 10 * 60 * 1000; //10 minutes
+  cookieStore.set({
+    name: accessTokenCookieName,
+    value: accessToken,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+    expires: Date.now() + accessTokenExpiration,
+  });
+
+  cookieStore.set({
+    name: userSessionCookieName,
+    value: user,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+  });
 }

@@ -6,10 +6,8 @@ import React, { Suspense } from "react";
 const FriendListPage = () => {
   return (
     <section className="flex flex-col size-full bg-dark-4">
-      <FriendListHeader />
-      <Suspense fallback={<FriendListDisplayLoading />}>
-        <FriendListDisplay />
-      </Suspense>
+      <div className="h-[98px]"><FriendListHeader /></div>
+      <FriendListDisplay />
     </section>
   );
 };
