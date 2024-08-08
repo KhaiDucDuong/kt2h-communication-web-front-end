@@ -1,0 +1,27 @@
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const page = searchParams.get('page')
+
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("access_token");
+
+  const dataSize = 20;
+  console.log(`Fetching friend list at page ${page}`);
+  const res = await fetch(
+    `${process.env.FETCH_FRIEND_LIST}?size=${dataSize}&page=${page}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken?.value}`,
+      },
+    }
+  );
+  const body = await res.json();
+  console.log("Friend list response: " + JSON.stringify(body));
+  return NextResponse.json({ body });
+}
