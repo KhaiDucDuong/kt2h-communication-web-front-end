@@ -1,9 +1,25 @@
-import React from 'react'
+"use client"
+import FriendRequestDisplay from "@/components/Friends/FriendRequests/FriendRequestDisplay";
+import FriendRequestHeader from "@/components/Friends/FriendRequests/FriendRequestHeader";
+import React, { useState } from "react";
 
-const FriendRequestsPage = () => {
-  return (
-    <div>FriendRequestsPage</div>
-  )
+export enum FriendRequestTab {
+  INCOMING = "INCOMING",
+  OUTGOING = "OUTGOING",
 }
 
-export default FriendRequestsPage
+const FriendRequestsPage = () => {
+  const [selectedTab, setSelectedTab] = useState<FriendRequestTab>(
+    FriendRequestTab.INCOMING
+  );
+  return (
+    <section className="flex flex-col size-full bg-dark-4">
+      <div className="h-[98px]">
+        <FriendRequestHeader selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+      </div>
+      <FriendRequestDisplay selectedTab={selectedTab}/>
+    </section>
+  );
+};
+
+export default FriendRequestsPage;
