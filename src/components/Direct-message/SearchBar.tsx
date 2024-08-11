@@ -3,7 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Input } from "../ui/input";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
-const SearchBar = () => {
+const SearchBar = (props: {
+  placeHolder: string
+}) => {
   return (
     <section className="flex flex-col justify-center m-auto size-full ">
       <div className=" flex relative justify-start mx-[5%]">
@@ -11,7 +13,7 @@ const SearchBar = () => {
         onClick={() => {}}/>
         <Input
           type="text"
-          placeholder="Find a conversation"
+          placeholder={props.placeHolder}
           className="w-[100%] bg-dark-10 text-gray-1 border-none pl-[38px]
          focus-visible:ring-0 placeholder:text-gray-1"
         />

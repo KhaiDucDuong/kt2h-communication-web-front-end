@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";
+import { getAccessToken } from "./services/AuthService";
 
 const authList = ["/sign-in", "/sign-up", "/forgot-password"];
 const whiteList = ["/"];
@@ -11,6 +12,7 @@ export function middleware(request: NextRequest) {
   let isAuthUrl = false;
   let isWhiteListUrl = false;
   const currentUser = cookieStore.get("user_session")?.value;
+
   authList.forEach((url) => {
     if (request.nextUrl.pathname === url) {
       isAuthUrl = true;
@@ -22,10 +24,6 @@ export function middleware(request: NextRequest) {
       isWhiteListUrl = true;
     }
   });
-
-  //logic to request a new access token if it's about to expire (ttl < 60s)
-  //or if it has expired
-  //...
 
   //go to sign-in page if user hasn't logged in and the request url is restricted
   if (!currentUser && !isAuthUrl && !isWhiteListUrl) {
