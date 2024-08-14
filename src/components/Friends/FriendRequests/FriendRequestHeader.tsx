@@ -7,12 +7,12 @@ const FriendRequestHeader = (props: {
   setSelectedTab: React.Dispatch<React.SetStateAction<FriendRequestTab>>;
 }) => {
   return (
-    <div className="h-[98px] w-full">
+    <div className="h-[98px] w-full text-[16px]">
       <div className="h-full flex col pl-[25px]">
         <div
           className={cn(
             "self-center mr-[12px] cursor-pointer hover:bg-dark-11  px-[6px] py-[2px] rounded-[4px] text-gray-5 ",
-            props.selectedTab === FriendRequestTab.INCOMING && "bg-dark-11"
+            props.selectedTab === FriendRequestTab.INCOMING && "bg-dark-11 text-gray-4"
           )}
           onClick={() => props.setSelectedTab(FriendRequestTab.INCOMING)}
         >
@@ -21,7 +21,7 @@ const FriendRequestHeader = (props: {
         <div
           className={cn(
             "self-center mr-[12px] cursor-pointer hover:bg-dark-11  px-[6px] py-[2px] rounded-[4px] text-gray-5 ",
-            props.selectedTab === FriendRequestTab.OUTGOING && "bg-dark-11"
+            props.selectedTab === FriendRequestTab.OUTGOING && "bg-dark-11 text-gray-4"
           )}
           onClick={() => props.setSelectedTab(FriendRequestTab.OUTGOING)}
         >
