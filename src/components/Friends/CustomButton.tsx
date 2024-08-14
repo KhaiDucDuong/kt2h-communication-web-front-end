@@ -13,6 +13,7 @@ const CustomButton = (props: {
   >;
   text: string;
   hoverColor: string;
+  filled: boolean;
   onClick: () => void;
 }) => {
   const [btnHovered, setBtnHovered] = useState<boolean>(false);
@@ -29,23 +30,33 @@ const CustomButton = (props: {
           onMouseLeave={() => setBtnHovered(false)}
           onClick={() => props.onClick()}
         >
-          <props.iconComponent
-            className="m-auto"
-            strokeWidth={1.7}
-            width={24}
-            height={24}
-          />
+          {props.filled ? (
+            <props.iconComponent
+              className="m-auto"
+              strokeWidth={1.7}
+              width={24}
+              height={24}
+              fill={btnHovered ? props.hoverColor : "#e4e4e4"}
+            />
+          ) : (
+            <props.iconComponent
+              className="m-auto"
+              strokeWidth={1.7}
+              width={24}
+              height={24}
+            />
+          )}
         </div>
         <div
           className={cn(
-            "self-center absolute top-[-125%]  left-[-11px] rounded-[6px] ",
-            "p-[8px] w-[60px] text-center bg-dark-8 text-[13px] text-white invisible ",
+            "self-center absolute top-[-125%]  left-[calc(-(25%-4px))] rounded-[6px] ",
+            "p-[8px] w-fit min-w-[60px] text-center bg-dark-8 text-[13px] text-white invisible ",
             btnHovered && "visible"
           )}
         >
           <span>{props.text}</span>
           <div
-            className="absolute top-[100%] left-[calc(50%-2.5px)]
+            className="absolute top-[100%] left-[calc(50%-5px)]
               border-l-[5px] border-x-transparent border-x-solid border-r-[5px] 
               border-t-[5px] border-t-solid border-t-dark-8"
           ></div>
