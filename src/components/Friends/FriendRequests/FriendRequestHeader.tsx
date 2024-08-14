@@ -7,7 +7,7 @@ const FriendRequestHeader = (props: {
   setSelectedTab: React.Dispatch<React.SetStateAction<FriendRequestTab>>;
 }) => {
   return (
-    <div className="h-[98px] w-full">
+    <div className="h-[98px] w-full text-[16px]">
       <div className="h-full flex col pl-[25px]">
         <div
           className={cn(

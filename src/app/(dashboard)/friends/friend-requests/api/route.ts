@@ -27,6 +27,48 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  let id = searchParams.get("id");
+  let status = searchParams.get("status");
+  const accessToken = await getAccessToken();
+
+  if (!accessToken) {
+    console.log("Faulty access token");
+    return;
+  }
+
+  const requestBodyData = {
+    "id": id,
+    "status": status
+  }
+
+  console.log(`Updating friend request ${id} with new status ${status}`);
+  try {
+    const res = await fetch(
+      `${process.env.UPDATE_FRIEND_REQUEST_STATUS}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBodyData)
+      }
+    );
+
+    if(res.status === 200){
+      revalidateTag("incomingFriendRequests")
+      console.log("Revalidate `incomingFriendRequests` tag")
+      return NextResponse.json({message: "ok"});
+    }
+    return NextResponse.error();
+  } catch (error) {
+    console.log("Error updating friend request status: " + error);
+    return;
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   let id = searchParams.get("id");

@@ -5,10 +5,10 @@ import Image from "next/image";
 import { XIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import CustomButton from "../CustomButton";
 
 const OutgoingFriendRequestRow = (props: { request: FriendRequestProps }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [cancelBtnHovered, setCancelBtnHovered] = useState<boolean>(false);
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
 
   async function deleteFriendRequest() {
@@ -73,39 +73,12 @@ const OutgoingFriendRequestRow = (props: { request: FriendRequestProps }) => {
         </div>
       </div>
       {!isDeleted ? (
-        <div className="relative self-center flex flex-row justify-center">
-          <div
-            className={cn(
-              "rounded-full bg-dark-1 p-[8px] text-gray-4 hover:text-red-1",
-              isHovered && "bg-dark-8"
-            )}
-            onMouseEnter={() => setCancelBtnHovered(true)}
-            onMouseLeave={() => setCancelBtnHovered(false)}
-            onClick={() => deleteFriendRequest()}
-          >
-            <XIcon
-              className="m-auto"
-              strokeWidth={1.7}
-              width={24}
-              height={24}
-            />
-          </div>
-          <div
-            className={cn(
-              "self-center absolute top-[-125%]  left-[-11px] rounded-[6px] ",
-              "p-[8px] w-[60px] text-center bg-dark-8 text-[13px] text-white invisible ",
-              cancelBtnHovered && "visible"
-            )}
-          >
-            <span>Cancel</span>
-            <div
-              className="absolute top-[100%] left-[calc(50%-2.5px)]
-              border-l-[5px] border-x-transparent border-x-solid border-r-[5px] 
-              border-t-[5px] border-t-solid border-t-dark-8"
-            ></div>
-          </div>
-          <div></div>
-        </div>
+        <CustomButton isHovered={isHovered}
+        iconComponent={XIcon}
+        text="Cancel"
+        hoverColor="red-1"
+        onClick={deleteFriendRequest}
+        />
       ) : (
         <div className="self-center text-[13px] text-gray-5">
           Request Removed
