@@ -55,6 +55,7 @@ const FriendListDisplay = () => {
         {friends.map((friend) => {
           return (
             <FriendRow
+              key={friend.friend_id}
               id={friend.friend_id}
               image={friend.image}
               firstName={friend.first_name}

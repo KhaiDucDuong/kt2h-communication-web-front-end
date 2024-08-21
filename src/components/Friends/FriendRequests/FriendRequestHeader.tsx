@@ -1,4 +1,4 @@
-import { FriendRequestTab } from "@/app/(dashboard)/friends/friend-requests/page";
+import { FriendRequestTab } from "@/types/ui";
 import { cn } from "@/lib/utils";
 import React from "react";
 

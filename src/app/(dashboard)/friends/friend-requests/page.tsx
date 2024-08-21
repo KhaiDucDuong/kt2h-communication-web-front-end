@@ -1,12 +1,8 @@
 "use client"
 import FriendRequestDisplay from "@/components/Friends/FriendRequests/FriendRequestDisplay";
 import FriendRequestHeader from "@/components/Friends/FriendRequests/FriendRequestHeader";
+import { FriendRequestTab } from "@/types/ui";
 import React, { useState } from "react";
-
-export enum FriendRequestTab {
-  INCOMING = "INCOMING",
-  OUTGOING = "OUTGOING",
-}
 
 const FriendRequestsPage = () => {
   const [selectedTab, setSelectedTab] = useState<FriendRequestTab>(

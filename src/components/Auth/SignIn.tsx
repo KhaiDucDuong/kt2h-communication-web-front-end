@@ -41,7 +41,7 @@ const SignIn = () => {
           Welcome back
         </h1>
         <p className="text-white text-[20px] max-sm:text-[16px]">
-          We're so excited to see you again!
+          We&apos;re so excited to see you again!
         </p>
       </div>
       <div>

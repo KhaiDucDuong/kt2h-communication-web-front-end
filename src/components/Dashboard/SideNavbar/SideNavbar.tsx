@@ -128,7 +128,7 @@ const SideNavbar = () => {
                           <DialogTitle>Edit profile</DialogTitle>
                           <DialogDescription className="text-gray-2">
                             Make changes to your profile here. Click save when
-                            you're done.
+                            you&apos;re done.
                           </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4 mt-2">

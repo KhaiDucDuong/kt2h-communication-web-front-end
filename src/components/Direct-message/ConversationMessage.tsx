@@ -53,9 +53,10 @@ const ConversationMessage = (props: ConversationMessageProps) => {
           </p>
         </div>
         {props.messages &&
-          props.messages.map((message) => {
+          props.messages.map((message, i) => {
             return (
               <div
+                key={i}
                 className={cn(
                   "rounded-[8px] bg-gray-5 px-[12px] py-[8px] mb-[4px] w-fit ",
                   props.fromUser && "self-end"

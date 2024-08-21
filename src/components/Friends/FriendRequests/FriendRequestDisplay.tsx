@@ -1,4 +1,4 @@
-import { FriendRequestTab } from "@/app/(dashboard)/friends/friend-requests/page";
+import { FriendRequestTab } from "@/types/ui";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import FriendRequestDisplayLoading from "./FriendRequestDisplayLoading";
@@ -80,12 +80,12 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
         {props.selectedTab === FriendRequestTab.INCOMING &&
           incomingRequests.map((request) => {
             if (request.status === RequestStatus.PENDING.toString())
-              return <IncomingFriendRequestRow request={request} />;
+              return <IncomingFriendRequestRow key={request.id} request={request} />;
           })}
         {props.selectedTab === FriendRequestTab.OUTGOING &&
           outgoingRequests.map((request) => {
             if (request.status === RequestStatus.PENDING.toString())
-              return <OutgoingFriendRequestRow request={request} />;
+              return <OutgoingFriendRequestRow key={request.id} request={request} />;
           })}
       </section>
     </ScrollArea>

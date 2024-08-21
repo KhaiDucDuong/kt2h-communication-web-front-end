@@ -148,6 +148,7 @@ export const conversationMessages = {
   toUserImage: "/assets/images/profile-pic.jpg",
   messageHistory: [
     {
+      id: 1,
       sentDateTime: new Date(2024, 7 - 1, 20, 12, 50),
       messages: [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
@@ -157,6 +158,7 @@ export const conversationMessages = {
       isSelfMessage: false,
     },
     {
+      id: 2,
       sentDateTime: new Date(2024, 7 - 1, 20, 13, 55),
       messages: [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
@@ -166,6 +168,7 @@ export const conversationMessages = {
       isSelfMessage: true,
     },
     {
+      id: 3,
       sentDateTime: new Date(2024, 7 - 1, 21, 6, 33),
       messages: [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
@@ -174,6 +177,7 @@ export const conversationMessages = {
       isSelfMessage: true,
     },
     {
+      id: 4,
       sentDateTime: new Date(2024, 7 - 1, 21, 13, 55),
       messages: [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
@@ -183,6 +187,7 @@ export const conversationMessages = {
       isSelfMessage: false,
     },
     {
+      id: 5,
       sentDateTime: new Date(2024, 7 - 1, 21, 15, 55),
       messages: [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
@@ -192,6 +197,7 @@ export const conversationMessages = {
       isSelfMessage: false,
     },
     {
+      id: 6,
       sentDateTime: new Date(2024, 7 - 1, 21, 16, 55),
       messages: [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",

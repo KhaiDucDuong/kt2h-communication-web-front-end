@@ -77,6 +77,7 @@ const OutgoingFriendRequestRow = (props: { request: FriendRequestProps }) => {
         iconComponent={XIcon}
         text="Cancel"
         hoverColor="red-1"
+        filled={false}
         onClick={deleteFriendRequest}
         />
       ) : (

@@ -21,7 +21,7 @@ const Conversation = () => {
             //last element
             if (i + 1 === length) {
               return (
-                <div ref={lastMessageRef}>
+                <div key={messageGroup.id} ref={lastMessageRef}>
                   <ConversationMessage
                     sentDateTime={messageGroup.sentDateTime}
                     fromUser={messageGroup.isSelfMessage}
@@ -32,7 +32,7 @@ const Conversation = () => {
               );
             } else {
               return (
-                <div>
+                <div key={messageGroup.id}>
                   <ConversationMessage
                     sentDateTime={messageGroup.sentDateTime}
                     fromUser={messageGroup.isSelfMessage}

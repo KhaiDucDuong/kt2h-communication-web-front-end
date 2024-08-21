@@ -165,7 +165,7 @@ export async function logOut() {
     } catch (error) {
       console.log("Error fetching sign up: " + error);
     }
-  } else console.log("Error: No refresh token found when logging out")
+  } else console.log("Error: No refresh token found when logging out");
 
   cookieStore.delete(refreshTokenCookieName);
   cookieStore.delete(accessTokenCookieName);
@@ -185,8 +185,9 @@ export async function getAccessToken() {
       return;
     }
 
+    let response;
     try {
-      const response = await fetch(`${process.env.USE_REFRESH_TOKEN_API}`, {
+      response = await fetch(`${process.env.USE_REFRESH_TOKEN_API}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -194,28 +195,28 @@ export async function getAccessToken() {
         },
         cache: "no-cache",
       });
-
-      const result = await response.json();
-      console.log("Refresh token response result: " + JSON.stringify(result));
-      if (result.statusCode === 200) {
-        //get refresh token from response cookies and set it to next server cookie
-        const setCookies = response.headers.getSetCookie();
-        setCookies.forEach((cookie) => {
-          cookie.match("refresh_token=");
-          const refreshTokenValue = cookie.split("refresh_token=")[1];
-          setAuthCookies(
-            result.data.access_token,
-            refreshTokenValue,
-            JSON.stringify(result.data.user)
-          );
-        });
-        return result.data.access_token;
-      } else {
-        logOut();
-        return;
-      }
     } catch (error) {
       console.log("Error fetching using refresh token: " + error);
+      logOut();
+      return;
+    }
+
+    const result = await response.json();
+    console.log("Refresh token response result: " + JSON.stringify(result));
+    if (result.statusCode === 200) {
+      //get refresh token from response cookies and set it to next server cookie
+      const setCookies = response.headers.getSetCookie();
+      setCookies.forEach((cookie) => {
+        cookie.match("refresh_token=");
+        const refreshTokenValue = cookie.split("refresh_token=")[1];
+        setAuthCookies(
+          result.data.access_token,
+          refreshTokenValue,
+          JSON.stringify(result.data.user)
+        );
+      });
+      return result.data.access_token;
+    } else {
       logOut();
       return;
     }
