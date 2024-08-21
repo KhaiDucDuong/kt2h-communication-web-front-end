@@ -1,4 +1,8 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
+import CustomButton from "../CustomButton";
+import { EllipsisVerticalIcon, MessageCircleIcon } from "lucide-react";
 
 const FriendRow = (props: {
   id: string;
@@ -7,10 +11,13 @@ const FriendRow = (props: {
   image: string;
   status: string;
 }) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   return (
     <section
       className="w-[96%] h-[72px] hover:bg-dark-1 hover:rounded-[8px]
     px-[14px] self-center flex flex-row justify-between cursor-pointer relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="w-[calc(100%-28px)] h-[1px] absolute border-t-[1px] border-dark-1"></div>
       <div className="flex flex-row">
@@ -35,8 +42,23 @@ const FriendRow = (props: {
         </div>
       </div>
       <div className="self-center flex flex-row">
-        <div className="mr-[8px]">Message Button</div>
-        <div>Elipsis Button</div>
+        <CustomButton
+          isHovered={isHovered}
+          iconComponent={MessageCircleIcon}
+          text="Message"
+          hoverColor="white"
+          filled={true}
+          onClick={() => {}}
+        />
+        <div className="w-[15px]"></div>
+        <CustomButton
+          isHovered={isHovered}
+          iconComponent={EllipsisVerticalIcon}
+          text="More"
+          hoverColor="white"
+          filled={false}
+          onClick={() => {}}
+        />
       </div>
     </section>
   );

@@ -76,10 +76,11 @@ const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
       {status === RequestStatus.PENDING && (
         <div className="self-center flex flex-row">
           <CustomButton
-            isHovered={isHovered}
+           isHovered={isHovered}
             iconComponent={XIcon}
             text="Cancel"
             hoverColor="red-1"
+            filled={false}
             onClick={() => {
               updateRequestStatus(RequestStatus.REJECTED);
             }}
@@ -90,10 +91,11 @@ const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
             iconComponent={CheckIcon}
             text="Accept"
             hoverColor="green-400"
+            filled={false}
             onClick={() => {
               updateRequestStatus(RequestStatus.ACCEPTED);
             }}
-          />
+          /> 
         </div>
       )}
       {status === RequestStatus.ACCEPTED && (
