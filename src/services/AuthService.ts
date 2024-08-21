@@ -146,6 +146,27 @@ export async function signIn(
 
 export async function logOut() {
   const cookieStore = cookies();
+  const refreshToken = cookieStore.get("refresh_token");
+
+  if (refreshToken?.value) {
+    try {
+      const response = await fetch(`${process.env.LOGOUT_API}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `${refreshTokenCookieName}=${refreshToken?.value};`,
+        },
+        cache: "no-cache",
+      });
+
+      if (response.status === 200) {
+        console.log("Request to log out successfully");
+      }
+    } catch (error) {
+      console.log("Error fetching sign up: " + error);
+    }
+  } else console.log("Error: No refresh token found when logging out")
+
   cookieStore.delete(refreshTokenCookieName);
   cookieStore.delete(accessTokenCookieName);
   cookieStore.delete(userSessionCookieName);
@@ -169,7 +190,7 @@ export async function getAccessToken() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Cookie": `${refreshTokenCookieName}=${refreshToken?.value};`,
+          Cookie: `${refreshTokenCookieName}=${refreshToken?.value};`,
         },
         cache: "no-cache",
       });
