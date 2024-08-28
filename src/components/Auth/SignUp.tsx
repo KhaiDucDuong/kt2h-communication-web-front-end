@@ -5,7 +5,6 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import SignUpSuccess from "./SignUpSuccess";
 
 function SubmitButton() {
   const { pending } = useFormStatus();

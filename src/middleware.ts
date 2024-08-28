@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";
 import { getAccessToken } from "./services/AuthService";
 
-const authList = ["/sign-in", "/sign-up", "/forgot-password"];
+const authList = ["/sign-in", "/sign-up", "/forgot-password", "/activate"];
 const whiteList = ["/"];
 
 export function middleware(request: NextRequest) {
