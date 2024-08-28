@@ -1,6 +1,7 @@
 "use server";
 
 import { loginSchema, registerSchema } from "@/types/auth";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 import { access } from "fs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -70,7 +71,11 @@ export async function signUp(
     console.log("Response result: " + JSON.stringify(result));
     if (result.statusCode === 201) {
       //other logics
-      return { successMessage: result.message, registeredEmail: result.data.email,hasRegisteredAccount: true };
+      return {
+        successMessage: result.message,
+        registeredEmail: result.data.email,
+        hasRegisteredAccount: true,
+      };
     }
     return { serverErrors: result.error, hasRegisteredAccount: false };
   } catch (error) {
@@ -143,6 +148,49 @@ export async function signIn(
   }
 
   return { errorMessage: result.error };
+}
+
+interface ActivationAccountResponse {
+  success: boolean;
+  username: string;
+}
+
+export async function activateAccount(key: string) : Promise<ActivationAccountResponse> {
+  let result: ActivationAccountResponse = {
+    success: false,
+    username: ""
+  } 
+
+  if (key === null || key.length !== 20) {
+    return result;
+  }
+
+  try {
+    const response = await fetch(
+      `${process.env.ACTIVATE_ACCOUNT_API}?key=${key}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-cache",
+      }
+    );
+
+    const result = await response.json();
+    console.log("Response result: " + JSON.stringify(result));
+
+    if (result.statusCode === 200) {
+      result.success = true;
+      result.username = result.data.username;
+      return result;
+    }
+  } catch (error) {
+    console.log("Error calling activate account api: " + error);
+    result.success = false;
+    return result;
+  }
+  return result
 }
 
 export async function logOut() {
