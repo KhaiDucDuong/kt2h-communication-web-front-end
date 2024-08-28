@@ -5,6 +5,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
+import SignUpSuccess from "./SignUpSuccess";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,6 +35,7 @@ const initialState: SignInMessages = {
   confirm_passwordErrors: [],
   serverErrors: [],
   successMessage: "",
+  registeredEmail: "",
   hasRegisteredAccount: false,
 };
 
@@ -48,6 +50,8 @@ const SignUp = () => {
     state.hasRegisteredAccount = false;
     formRef.current.reset();
   }
+
+  // return <SignUpSuccess email="khai@gmail"/>
 
   return (
     <form
@@ -236,8 +240,20 @@ const SignUp = () => {
             <p className="text-red-1 my-[5px]">{state.serverErrors}</p>
           )}
           {state?.successMessage && (
-            <p className="text-green-400 my-[5px]">{state.successMessage}</p>
+            <div
+              className="border-green-400 border-[1px]
+            text-white max-w-[434px] self-center mb-[8px] p-[8px]"
+            >
+              <p className="font-bold mb-[6px]">
+                Your account has been created.
+              </p>
+              <p>
+                We sent an email to <span className="font-bold">{state.registeredEmail}</span>. Please check it to
+                activate your account and get started.
+              </p>
+            </div>
           )}
+
           <Link href={"/sign-in"} className="text-blue-1 hover:underline">
             Already have an account?
           </Link>

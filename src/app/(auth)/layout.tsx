@@ -11,7 +11,7 @@ export default function AuthLayout({
       cursor-pointer">
         KT2H
       </Link>
-      <div className="w-fit h-fit m-auto">{children}</div>
+      <div className="w-fit max-w-[80%] max-sm:max-w-[93%] h-fit m-auto">{children}</div>
       <div className="absolute top-0 right-0 w-[100vw] h-[100vh] bg-[#201D22] z-[-999]"></div>
     </section>
   );

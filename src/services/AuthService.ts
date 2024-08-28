@@ -18,6 +18,7 @@ export interface SignInMessages {
   confirm_passwordErrors?: string[];
   serverErrors?: string[];
   successMessage?: "";
+  registeredEmail?: "";
   hasRegisteredAccount: boolean;
 }
 
@@ -69,7 +70,7 @@ export async function signUp(
     console.log("Response result: " + JSON.stringify(result));
     if (result.statusCode === 201) {
       //other logics
-      return { successMessage: result.message, hasRegisteredAccount: true };
+      return { successMessage: result.message, registeredEmail: result.data.email,hasRegisteredAccount: true };
     }
     return { serverErrors: result.error, hasRegisteredAccount: false };
   } catch (error) {
