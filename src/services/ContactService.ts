@@ -2,8 +2,8 @@ export function getLastSentDisplayDateTime(lastSent: Date): string{
     const now = new Date();
     const differenceInTime = Math.abs(now.getTime() - lastSent.getTime())
     const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24))
-    console.log("Time dif: " + differenceInTime)
-    console.log("Day dif: " + differenceInDays)
+    // console.log("Time dif: " + differenceInTime)
+    // console.log("Day dif: " + differenceInDays)
     let result = ""
     if(differenceInDays === 0){
         result = lastSent.toLocaleTimeString("vi-VN", {hour: "2-digit", minute: "2-digit"})
@@ -16,7 +16,7 @@ export function getLastSentDisplayDateTime(lastSent: Date): string{
     } else if(differenceInDays >= 365){
         result = lastSent.getFullYear().toString()
     }
-    console.log("Formated last sent: " + result)
+    // console.log("Formated last sent: " + result)
     return result;
 }
 
@@ -24,8 +24,8 @@ export function getFriendRequestSentDateTime(lastSent: number): string{
     const now = new Date();
     const differenceInTime = Math.abs(now.getTime() - lastSent)
     const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24))
-    console.log("Time dif: " + differenceInTime)
-    console.log("Day dif: " + differenceInDays)
+    // console.log("Time dif: " + differenceInTime)
+    // console.log("Day dif: " + differenceInDays)
     let result = ""
     if(differenceInDays === 0){
         result = new Date(lastSent).toLocaleTimeString("vi-VN", {hour: "2-digit", minute: "2-digit"})
@@ -38,6 +38,6 @@ export function getFriendRequestSentDateTime(lastSent: number): string{
     } else if(differenceInDays >= 365){
         result = new Date(lastSent).getFullYear().toString()
     }
-    console.log("Formated last sent: " + result)
+    // console.log("Formated last sent: " + result)
     return result;
 }

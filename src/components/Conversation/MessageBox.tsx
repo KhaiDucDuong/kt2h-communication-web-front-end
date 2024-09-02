@@ -11,9 +11,29 @@ import {
   ThumbsUpIcon,
 } from "lucide-react";
 import { ChangeEvent, useState } from "react";
+import { Client } from "@stomp/stompjs";
+import { User } from "@/types/user";
 
-const MessageBox = () => {
+interface MessageBoxProps {
+  stompClient: Client;
+  currentUser: User;
+}
+
+const MessageBox = (props: MessageBoxProps) => {
   const [text, setText] = useState<string>("");
+
+  const handleSendMessage = () => {
+    props.stompClient.publish({
+      destination: "/app/private-message",
+      body: JSON.stringify({
+        conversation_id: "34c00248-04af-4270-ab0b-ca36ffb2e597",
+        sender_id: props.currentUser.user_id,
+        message: text,
+      }),
+    });
+    setText("");
+    (document.getElementById("message-box") as HTMLInputElement).value = "";
+  };
 
   return (
     <section className="h-fit w-full bg-gray-6 flex flex-col">
@@ -72,6 +92,7 @@ const MessageBox = () => {
         <input
           className="w-[calc(100%-20px)] h-fit max-h-[180px] m-auto ml-[20px] border-none bg-transparent
           focus:outline-none placeholder:text-gray-1 text-gray-2"
+          id="message-box"
           type="text"
           placeholder="Type something ..."
           defaultValue={text}
@@ -99,6 +120,7 @@ const MessageBox = () => {
                 strokeWidth={1.7}
                 width={24}
                 height={24}
+                onClick={handleSendMessage}
               />
             ) : (
               // <ThumbsUpIcon
@@ -107,11 +129,11 @@ const MessageBox = () => {
               //   width={24}
               //   height={24}
               // />
-              <Image 
-              src={"/assets/images/penguin.png"}
-              width={24}
-              height={24}
-              alt="penguin icon"
+              <Image
+                src={"/assets/images/penguin.png"}
+                width={24}
+                height={24}
+                alt="penguin icon"
               />
             )}
           </div>

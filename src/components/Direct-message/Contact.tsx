@@ -12,7 +12,7 @@ const Contact = (props: ContactProps) => {
   let displayLastSent = ""
   try {
     const validatedContactProps = contactRowSchema.parse(props);
-    console.log(validatedContactProps)
+    // console.log(validatedContactProps)
     if(props.lastSent !== undefined){
       displayLastSent = getLastSentDisplayDateTime(props.lastSent)
     }

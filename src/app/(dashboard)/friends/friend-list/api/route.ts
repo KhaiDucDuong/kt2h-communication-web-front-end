@@ -1,6 +1,5 @@
 import { getAccessToken } from "@/services/AuthService";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

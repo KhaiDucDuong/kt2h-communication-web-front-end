@@ -3,8 +3,15 @@ import { ScrollArea } from "../ui/scroll-area";
 import { conversationMessages } from "@/utils/constants";
 import ConversationMessage from "../Direct-message/ConversationMessage";
 import MessageBox from "./MessageBox";
+import { Client } from "@stomp/stompjs";
+import { User } from "@/types/user";
 
-const Conversation = () => {
+interface ConversationProps {
+  stompClient: Client
+  currentUser: User
+}
+
+const Conversation = (props: ConversationProps) => {
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
   useEffect(() => {
     // console.log("Message Ref: " + lastMessageRef)
@@ -45,7 +52,7 @@ const Conversation = () => {
           }
         )}
       </ScrollArea>
-      <MessageBox />
+      <MessageBox stompClient={props.stompClient} currentUser={props.currentUser} />
     </section>
   );
 };

@@ -3,8 +3,15 @@ import { useState } from "react";
 import ContactMessageHeader from "./ContactMessageHeader";
 import ContactMoreInfoPanel from "./ContactMoreInfoPanel";
 import Conversation from "../Conversation/Conversation";
+import { Client } from "@stomp/stompjs";
+import { User } from "@/types/user";
 
-const MessagePanel = () => {
+interface MessagePanelProps {
+  stompClient: Client
+  currentUser: User
+}
+
+const MessagePanel = (props: MessagePanelProps) => {
   const [isMoreInfoExpanded, setIsMoreInfoExpanded] = useState<boolean>(false)
 
   return (
@@ -19,7 +26,7 @@ const MessagePanel = () => {
           <div className="relative flex  border-dark-10 border-[1px] "></div>
         </div>
         <div className="pt-[2px] size-full max-h-[calc(100vh-98px)]">
-          <Conversation />
+          <Conversation stompClient={props.stompClient} currentUser={props.currentUser} />
         </div>
       </div>
       <ContactMoreInfoPanel className={isMoreInfoExpanded ? "" : "hidden"}/>

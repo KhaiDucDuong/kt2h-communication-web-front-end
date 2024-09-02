@@ -1,14 +1,15 @@
 "use server";
 
 import { loginSchema, registerSchema } from "@/types/auth";
+import { accessTokenCookieName, refreshTokenCookieName, userSessionCookieName } from "@/utils/constants";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 import { access } from "fs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const accessTokenCookieName = "access_token";
-const refreshTokenCookieName = "refresh_token";
-const userSessionCookieName = "user_session";
+// export const accessTokenCookieName = "access_token";
+// export const refreshTokenCookieName = "refresh_token";
+// export const userSessionCookieName = "user_session";
 
 export interface SignInMessages {
   emailErrors?: string[];
