@@ -301,7 +301,7 @@ async function setAuthCookies(
     expires: Date.now() + refreshTokenExpiration,
   });
 
-  const accessTokenExpiration = 10 * 60 * 1000; //10 minutes
+  const accessTokenExpiration = 60 * 60  * 1000; //60 minutes
   cookieStore.set({
     name: accessTokenCookieName,
     value: accessToken,

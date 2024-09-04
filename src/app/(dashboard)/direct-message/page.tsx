@@ -8,14 +8,20 @@ import { userSessionCookieName } from "@/utils/constants";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
+import { Contact, getContactsFromResponse } from "@/types/contact";
+import { ContactResponse } from "@/types/response";
 
 const DirectMessagePage = () => {
   const [currentUser, setCurrentUser] = useState<User>();
   const [stompClient, setStompClient] = useState<Client>();
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contactPage, setContactPage] = useState<number>(1);
+  const [hasMoreContacts, setHasMoreContacts] = useState<boolean>(true);
 
   useEffect(() => {
     connectWebSocket();
+    fetchContacts();
   }, []);
 
   async function fetchCurrentUser() {
@@ -63,12 +69,33 @@ const DirectMessagePage = () => {
     console.log(JSON.stringify(parsed))
   };
 
+  const fetchContacts = async () => {
+    if(!hasMoreContacts) return;
+    const res = await fetch(`/direct-message/api/contact?page=${contactPage}`, {
+      method: "GET",
+    });
+    const body = await res.json() as ContactResponse;
+    if(!res.ok) {
+      console.log("Failed to fetch contacts");
+    } else {
+      console.log("Contacts data: ", body);
+      const fetchedContacts = getContactsFromResponse(body)
+      if(fetchedContacts === null) return
+      setContacts((prev) => [...prev, ...fetchedContacts]);
+      setContactPage(body.data.meta.page + 1);
+      setHasMoreContacts(body.data.meta.page < body.data.meta.pages);
+    }
+  }
+
   if (!stompClient || !currentUser) {
     return <div>Loading...</div>;
   }
 
   return (
     <section className="flex flex-row size-full">
+      <p>{JSON.stringify(contacts)}</p>
+      <p>{JSON.stringify(contactPage)}</p>
+      <p>{JSON.stringify(hasMoreContacts)}</p>
       <ContactListPanel />
       <MessagePanel stompClient={stompClient} currentUser={currentUser}/>
     </section>

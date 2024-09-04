@@ -3,6 +3,11 @@ export enum UserRole {
     USER = "USER"
 }
 
+export enum UserStatus {
+    ONLINE = "ONLINE",
+    OFFLINE = "OFFLINE",
+}
+
 export interface User {
     email: string;
     first_name: string;
@@ -10,5 +15,5 @@ export interface User {
     user_id: string;
     image?: string;
     phone?: string;
-    role: UserRole;
+    role?: UserRole;
   }
