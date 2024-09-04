@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import FriendRequestDisplayLoading from "./FriendRequestDisplayLoading";
 import IncomingFriendRequestRow from "./IncomingFriendRequestRow";
 import OutgoingFriendRequestRow from "./OutgoingFriendRequestRow";
+import { useRouter } from "next/navigation";
 
 export interface FriendRequestProps {
   id: string;
@@ -26,6 +27,7 @@ export enum RequestStatus {
 }
 
 const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [incomingRequests, setIncomingRequests] = useState<
@@ -37,14 +39,20 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   async function fetchFriendRequest() {
+    let res;
     try {
       const requestType = props.selectedTab.toString();
-      const res = await fetch(
+      res = await fetch(
         `/friends/friend-requests/api?page=${currentPage}&type=${requestType}`,
         {
           method: "GET",
         }
       );
+      
+      if(res.status !== 200) {
+        throw new Error("Failed to fetch friend requests");
+      }
+
       const data = await res.json();
       if (data.body.statusCode === 200) {
         // setFriends(data.body.data.result);
@@ -58,6 +66,10 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
       console.log("Response :" + JSON.stringify(data.body));
     } catch (error) {
       console.log("Error: " + error);
+    }
+
+    if (res?.status === 401) {
+      router.push("/");
     }
   }
 
@@ -80,12 +92,16 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
         {props.selectedTab === FriendRequestTab.INCOMING &&
           incomingRequests.map((request) => {
             if (request.status === RequestStatus.PENDING.toString())
-              return <IncomingFriendRequestRow key={request.id} request={request} />;
+              return (
+                <IncomingFriendRequestRow key={request.id} request={request} />
+              );
           })}
         {props.selectedTab === FriendRequestTab.OUTGOING &&
           outgoingRequests.map((request) => {
             if (request.status === RequestStatus.PENDING.toString())
-              return <OutgoingFriendRequestRow key={request.id} request={request} />;
+              return (
+                <OutgoingFriendRequestRow key={request.id} request={request} />
+              );
           })}
       </section>
     </ScrollArea>

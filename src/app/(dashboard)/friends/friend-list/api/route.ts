@@ -4,13 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const page = searchParams.get("page");
-  const accessToken = await getAccessToken();
+  const accessToken = await getAccessToken(false);
 
   if (!accessToken) {
     console.log("Faulty access token");
     return NextResponse.json(
       { message: "Faulty access token" },
-      { status: 500 }
+      { status: 401 }
     );
   }
 

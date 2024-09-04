@@ -1,6 +1,6 @@
 "use server";
 import { User } from "@/types/user";
-import { getAccessToken } from "./AuthService";
+import { getAccessToken, logOut } from "./AuthService";
 import { cookies } from "next/headers";
 import { userSessionCookieName } from "@/utils/constants";
 
