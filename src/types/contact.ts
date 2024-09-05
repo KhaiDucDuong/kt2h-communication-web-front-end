@@ -9,21 +9,21 @@ export interface ContactProps extends ContactRow {
 
 //contact
 export interface ContactRow {
-  image: string;
-  username: string;
-  noMissedMessages: number;
-  isLastMessageFromUser?: boolean;
-  lastMessage?: string;
-  lastSent?: Date;
+  image: string | null;
+  nickname: string;
+  // noMissedMessages: number;
+  // isLastMessageFromUser?: boolean;
+  // lastMessage?: string;
+  // lastSent?: Date;
 }
 
 export const contactRowSchema: z.ZodType<ContactRow> = z.object({
-  image: z.string(),
-  username: z.string(),
-  noMissedMessages: z.number().min(0).max(999),
-  isLastMessageFromUser: z.boolean().optional(),
-  lastMessage: z.string().optional(),
-  lastSent: z.date().optional(),
+  image: z.string().nullable(),
+  nickname: z.string(),
+  // noMissedMessages: z.number().min(0).max(999),
+  // isLastMessageFromUser: z.boolean().optional(),
+  // lastMessage: z.string().optional(),
+  // lastSent: z.date().optional(),
 });
 
 export interface Contact {
@@ -32,7 +32,7 @@ export interface Contact {
   requester_nickname: string;
   to_user_id: string;
   to_user_nickname: string;
-  to_user_image?: string | null;
+  to_user_image: string | null;
   to_user_first_name: string;
   to_user_last_name: string;
   to_user_status: UserStatus;
@@ -46,7 +46,7 @@ export const contactSchema: z.ZodType<Contact> = z.object({
   requester_nickname: z.string(),
   to_user_id: z.string().uuid(),
   to_user_nickname: z.string(),
-  to_user_image: z.string().optional().nullable(),
+  to_user_image: z.string().nullable(),
   to_user_first_name: z.string(),
   to_user_last_name: z.string(),
   to_user_status: z.nativeEnum(UserStatus),
