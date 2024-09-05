@@ -8,6 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Contact } from "@/types/contact";
 
 interface ContactMessageHeaderProps {
   profileHandleClick: () => void,
@@ -15,10 +16,11 @@ interface ContactMessageHeaderProps {
   cameraHandleClick: () => void,
   elipsisHandleClick: () => void,
   isMoreInfoPannelExpanded: boolean,
+  contact: Contact,
 }
 
 const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
-    
+    const {contact} = props;
 
   return (
     <section className="flex flex-row justify-between m-auto size-full ">
@@ -26,18 +28,18 @@ const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
         <div className="min-w-fit flex flex-col justify-center mr-[8px]
         cursor-pointer">
           <Image
-            src="/assets/images/profile-pic.jpg"
-            alt="contact's image"
+            src={contact.to_user_image === null ? "/assets/images/profile-pic.jpg" : contact.to_user_image}
+            alt={contact.to_user_nickname + "'s profile picture"}
             width={60}
             height={60}
             className="w-[50px] h-[50px] rounded-full max-sm:w-[40px] max-sm:h-[40px]"
           />
         </div>
         <div className="h-full flex flex-col justify-between max-w-[calc(100%-82px)]">
-          <p className="font-bold text-gray-4 truncate">
-            Username asfgasdfsadf
+          <p className="mt-[4px] font-bold text-gray-4 truncate">
+            {contact.to_user_nickname}
           </p>
-          <p className="text-gray-5">Online</p>
+          <p className="text-gray-5">{contact.to_user_status.toLowerCase()}</p>
         </div>
       </div>
       <div className="w-fit h-full flex flex-col justify-center">

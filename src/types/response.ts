@@ -1,4 +1,5 @@
 import { Contact } from "./contact";
+import { MessageType } from "./message";
 import { UserStatus } from "./user";
 
 export interface GenericResponse {
@@ -31,6 +32,20 @@ export interface ContactResponse extends GenericResponse {
         to_user_email: string;
         to_user_status: UserStatus;
       };
+    }[];
+  };
+}
+
+export interface ConversationMessageResponse extends GenericResponse {
+  data: GenericMetaResponse & {
+    result: {
+      id: string;
+      message: string;
+      sender_id: string;
+      sender_nickname: string;
+      message_type: MessageType;
+      is_reacted: boolean;
+      sent_at: number;
     }[];
   };
 }

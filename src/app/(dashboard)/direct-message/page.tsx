@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
 import DirectMessage from "@/components/Direct-message/DirectMessage";
+import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
 
 const DirectMessagePage = () => {
   const [currentUser, setCurrentUser] = useState<User>();
@@ -32,7 +33,7 @@ const DirectMessagePage = () => {
       brokerURL: stompClientUrl,
     });
     stompClient.onConnect = function () {
-      console.log("Successfully connected to STOMP client.");
+      // console.log("Successfully connected to STOMP client.");
       stompClient.subscribe(
         "/user/" + currentUser.user_id + "/private",
         onPrivateMessage
@@ -65,7 +66,13 @@ const DirectMessagePage = () => {
   }
 
   return (
-    <DirectMessage stompClient={stompClient} currentUser={currentUser}/>
+    <section className="flex">
+      <SideNavbar currentUser={currentUser}/>
+      <div className="w-full">
+        <DirectMessage stompClient={stompClient} currentUser={currentUser}/>
+      </div>
+    </section>
+    
   );
 };
 

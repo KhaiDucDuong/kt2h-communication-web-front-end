@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Message } from "@/types/message";
 import Image from "next/image";
 import { forwardRef } from "react";
 
@@ -7,7 +8,7 @@ interface ConversationMessageProps {
   fromUser: boolean;
   senderName?: string;
   senderImage?: string;
-  messages?: string[];
+  messages: Message[];
   attachedImages?: string[];
   sticker?: string[]; //update this later
   icon?: string[]; //update this later
@@ -62,7 +63,7 @@ const ConversationMessage = (props: ConversationMessageProps) => {
                   props.fromUser && "self-end"
                 )}
               >
-                <p className="wrap text-dark-9">{message}</p>
+                <p className="wrap text-dark-9">{message.message}</p>
               </div>
             );
           })}

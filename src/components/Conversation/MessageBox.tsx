@@ -17,6 +17,7 @@ import { User } from "@/types/user";
 interface MessageBoxProps {
   stompClient: Client;
   currentUser: User;
+  contactId: string;
 }
 
 const MessageBox = (props: MessageBoxProps) => {
@@ -26,7 +27,7 @@ const MessageBox = (props: MessageBoxProps) => {
     props.stompClient.publish({
       destination: "/app/private-message",
       body: JSON.stringify({
-        conversation_id: "34c00248-04af-4270-ab0b-ca36ffb2e597",
+        conversation_id: props.contactId,
         sender_id: props.currentUser.user_id,
         message_type: "TEXT",
         message: text,

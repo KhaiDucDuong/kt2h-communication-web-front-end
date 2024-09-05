@@ -32,7 +32,7 @@ const DirectMessage = (props: DirectMessageProps) => {
     if (!res.ok) {
       console.log("Failed to fetch contacts");
     } else {
-      console.log("Contacts data: ", body);
+      // console.log("Contacts data: ", body);
       const fetchedContacts = getContactsFromResponse(body);
       if (fetchedContacts === null) return;
       setContacts((prev) => [...prev, ...fetchedContacts]);
@@ -43,7 +43,7 @@ const DirectMessage = (props: DirectMessageProps) => {
   return (
     <section className="flex flex-row size-full">
       <ContactListPanel contacts={contacts} selectedContact={selectedContact} onSelectContact={setSelectedContact} />
-      <MessagePanel stompClient={props.stompClient} currentUser={props.currentUser} />
+      <MessagePanel stompClient={props.stompClient} currentUser={props.currentUser} contact={selectedContact} />
     </section>
   );
 };
