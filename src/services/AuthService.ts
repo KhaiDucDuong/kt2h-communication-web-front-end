@@ -1,14 +1,19 @@
 "use server";
 
 import { loginSchema, registerSchema } from "@/types/auth";
+import {
+  accessTokenCookieName,
+  refreshTokenCookieName,
+  userSessionCookieName,
+} from "@/utils/constants";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 import { access } from "fs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const accessTokenCookieName = "access_token";
-const refreshTokenCookieName = "refresh_token";
-const userSessionCookieName = "user_session";
+// export const accessTokenCookieName = "access_token";
+// export const refreshTokenCookieName = "refresh_token";
+// export const userSessionCookieName = "user_session";
 
 export interface SignInMessages {
   emailErrors?: string[];
@@ -155,11 +160,13 @@ interface ActivationAccountResponse {
   username: string;
 }
 
-export async function activateAccount(key: string) : Promise<ActivationAccountResponse> {
+export async function activateAccount(
+  key: string
+): Promise<ActivationAccountResponse> {
   let result: ActivationAccountResponse = {
     success: false,
-    username: ""
-  } 
+    username: "",
+  };
 
   if (key === null || key.length !== 20) {
     return result;
@@ -190,10 +197,10 @@ export async function activateAccount(key: string) : Promise<ActivationAccountRe
     result.success = false;
     return result;
   }
-  return result
+  return result;
 }
 
-export async function logOut() {
+export async function logOut(isRedirect: boolean = true) {
   const cookieStore = cookies();
   const refreshToken = cookieStore.get("refresh_token");
 
@@ -210,19 +217,23 @@ export async function logOut() {
 
       if (response.status === 200) {
         console.log("Request to log out successfully");
+      } else {
+        console.log("Request to log out failed");
       }
     } catch (error) {
-      console.log("Error fetching sign up: " + error);
+      console.log("Error fetching logging out api: " + error);
     }
   } else console.log("Error: No refresh token found when logging out");
 
   cookieStore.delete(refreshTokenCookieName);
   cookieStore.delete(accessTokenCookieName);
   cookieStore.delete(userSessionCookieName);
-  redirect("/");
+  if (isRedirect) {
+    redirect("/");
+  }
 }
 
-export async function getAccessToken() {
+export async function getAccessToken(redirectIfFail: boolean = true) {
   const cookieStore = cookies();
   let accessToken = cookieStore.get("access_token");
 
@@ -230,7 +241,7 @@ export async function getAccessToken() {
     //use refresh token
     const refreshToken = cookieStore.get("refresh_token");
     if (refreshToken === undefined) {
-      logOut();
+      await logOut(redirectIfFail);
       return;
     }
 
@@ -246,7 +257,7 @@ export async function getAccessToken() {
       });
     } catch (error) {
       console.log("Error fetching using refresh token: " + error);
-      logOut();
+      await logOut(redirectIfFail);
       return;
     }
 
@@ -266,7 +277,7 @@ export async function getAccessToken() {
       });
       return result.data.access_token;
     } else {
-      logOut();
+      await logOut(redirectIfFail);
       return;
     }
   }
@@ -290,7 +301,7 @@ async function setAuthCookies(
     expires: Date.now() + refreshTokenExpiration,
   });
 
-  const accessTokenExpiration = 10 * 60 * 1000; //10 minutes
+  const accessTokenExpiration = 60 * 60  * 1000; //60 minutes
   cookieStore.set({
     name: accessTokenCookieName,
     value: accessToken,

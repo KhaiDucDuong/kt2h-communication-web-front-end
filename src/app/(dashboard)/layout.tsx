@@ -1,5 +1,3 @@
-import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
-
 export default function DashboardLayout({
   children,
 }: {
@@ -7,10 +5,11 @@ export default function DashboardLayout({
 }) {
   return (
     <section className="relative">
-      <div className="flex">
+      {/* <div className="flex">
         <SideNavbar />
         <div className="w-full">{children}</div>
-      </div>
+      </div> */}
+      <div className="size-full">{children}</div>
     </section>
   );
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FriendRow from "./FriendRow";
 import FriendListDisplayLoading from "./FriendListDisplayLoading";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useRouter } from "next/navigation";
 
 interface Friend {
   friend_id: string;
@@ -13,16 +14,24 @@ interface Friend {
 }
 
 const FriendListDisplay = () => {
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   async function fetchFriendList() {
+    
+    let res;
     try {
-      const res = await fetch(`/friends/friend-list/api?page=${currentPage}`, {
+      res = await fetch(`/friends/friend-list/api?page=${currentPage}`, {
         method: "GET",
       });
+      
+      if(res.status !== 200) {
+        throw new Error("Failed to fetch friend list");
+      }
+
       const data = await res.json();
       if (data.body.statusCode === 200) {
         setFriends(data.body.data.result);
@@ -32,6 +41,10 @@ const FriendListDisplay = () => {
       console.log("Response :" + JSON.stringify(data.body));
     } catch (error) {
       console.log("Error: " + error);
+    }
+
+    if (res?.status === 401) {
+      router.push("/");
     }
   }
 

@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   let page = searchParams.get("page");
   const type = searchParams.get("type");
-  const accessToken = await getAccessToken();
+  const accessToken = await getAccessToken(false);
 
   if (!accessToken) {
     console.log("Faulty access token");

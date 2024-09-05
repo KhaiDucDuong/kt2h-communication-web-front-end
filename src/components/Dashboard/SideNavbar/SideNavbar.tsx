@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { User, Settings, LogOut, UserRoundPen } from "lucide-react";
+import { UserIcon, Settings, LogOut, UserRoundPen } from "lucide-react";
 
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -34,8 +34,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { logOut } from "@/services/AuthService";
+import { User } from "@/types/user";
 
-const SideNavbar = () => {
+interface SideNavbarProps {
+  currentUser: User;
+}
+
+const SideNavbar = (props: SideNavbarProps) => {
   const pathname = usePathname();
   return (
     <nav className="min-w-[64px] min-h-screen bg-dark-10">
@@ -47,10 +52,14 @@ const SideNavbar = () => {
                 <DropdownMenuTrigger className="outline-none">
                   <Image
                     className="rounded-full m-auto hover:cursor-pointer"
-                    src="/assets/images/khai.jpg"
+                    src={
+                      props.currentUser.image === null
+                        ? "/assets/images/profile-pic.jpg"
+                        : props.currentUser.image
+                    }
                     width={48}
                     height={48}
-                    alt="User's profile picture"
+                    alt={props.currentUser.first_name + "'s profile picture"}
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -61,7 +70,7 @@ const SideNavbar = () => {
                   <DropdownMenuSeparator />
                   <DialogTrigger asChild className="outline-none">
                     <DropdownMenuItem className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
+                      <UserIcon className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
                   </DialogTrigger>
@@ -84,12 +93,20 @@ const SideNavbar = () => {
                   <div className="flex items-center space-x-10 mt-4">
                     <Image
                       className="rounded-full "
-                      src="/assets/images/khai.jpg"
-                      alt="Profile image"
+                      src={
+                        props.currentUser.image === null
+                          ? "/assets/images/profile-pic.jpg"
+                          : props.currentUser.image
+                      }
+                      alt={props.currentUser.first_name + "'s profile picture"}
                       width={70}
                       height={70}
                     />
-                    <p className="font-semibold">Khai Siu Vai </p>
+                    <p className="font-semibold">
+                      {props.currentUser.last_name +
+                        " " +
+                        props.currentUser.first_name}
+                    </p>
                   </div>
                 </DialogHeader>
                 <div className="flex flex-col space-y-4 mt-4 ">
@@ -98,20 +115,22 @@ const SideNavbar = () => {
                       Email:
                     </span>
                     <span className="flex-1 text-gray-4">
-                      khaisiuvai@gmail.com
+                      {props.currentUser.email}
                     </span>
                   </DialogDescription>
                   <DialogDescription className="flex items-center space-x-4">
                     <span className="font-semibold w-24 text-gray-2">
                       Phone:
                     </span>
-                    <span className="flex-1 text-gray-4">0914712845</span>
+                    <span className="flex-1 text-gray-4">
+                      {props.currentUser.phone || ""}
+                    </span>
                   </DialogDescription>
                   <DialogDescription className="flex items-center space-x-4">
                     <span className="font-semibold w-24 text-gray-2">
                       Gender:
                     </span>
-                    <span className="flex-1 text-gray-4">Gay</span>
+                    <span className="flex-1 text-gray-4">Male</span>
                   </DialogDescription>
                   <DialogFooter>
                     <Dialog>
