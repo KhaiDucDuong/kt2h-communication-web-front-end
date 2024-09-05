@@ -65,12 +65,14 @@ export function getMessagesFromResponse(
 
 export function groupMessagesFromSameSender(messages: Message[]): MessageGroup[] {
     const groupedMessages: MessageGroup[] = [];
-    for (const message of messages) {
-        if (groupedMessages.length === 0 || groupedMessages[groupedMessages.length - 1].sender_id !== message.sender_id) {
+    for (const message of messages.toReversed()) {
+        if (groupedMessages.length === 0 
+            || groupedMessages[groupedMessages.length - 1].sender_id !== message.sender_id 
+            || groupedMessages[groupedMessages.length - 1].sentDateTime.getTime() + 1000 * 60 * 5 > message.sent_at * 1000) {
             groupedMessages.push({
                 sender_id: message.sender_id,
                 messages: [message],
-                sentDateTime: new Date(message.sent_at + 1437647493 * 1000)
+                sentDateTime: new Date(message.sent_at * 1000)
             });
         } else {
             groupedMessages[groupedMessages.length - 1].messages.push(message);

@@ -1,15 +1,17 @@
 "use client";
 
-import { Client, Message } from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
 import DirectMessage from "@/components/Direct-message/DirectMessage";
 import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
+import { Message, messageSchema } from "@/types/message";
 
 const DirectMessagePage = () => {
   const [currentUser, setCurrentUser] = useState<User>();
   const [stompClient, setStompClient] = useState<Client>();
+  const [newConversationMessage, setNewConversationMessage] = useState<Message | null>(null);
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const DirectMessagePage = () => {
   async function connectWebSocket() {
     console.log("Fetching current user...");
     const currentUser = await fetchCurrentUser();
-    if(!currentUser) return;
+    if (!currentUser) return;
     console.log("Creating STOMP client...");
     const stompClient = new Client({
       brokerURL: stompClientUrl,
@@ -38,7 +40,12 @@ const DirectMessagePage = () => {
         "/user/" + currentUser.user_id + "/private",
         onPrivateMessage
       );
-      console.log("Successfully subscribe to " + "/user/" + currentUser.user_id + "/private");
+      console.log(
+        "Successfully subscribe to " +
+          "/user/" +
+          currentUser.user_id +
+          "/private"
+      );
       setStompClient(stompClient);
     };
 
@@ -55,10 +62,16 @@ const DirectMessagePage = () => {
   }
 
   const onPrivateMessage = (payload: any) => {
-    const parsed = JSON.parse(payload.body)
+    const message = JSON.parse(payload.body) as Message;
     console.log("Receive a private message");
-    console.log(parsed);
-    console.log(JSON.stringify(parsed))
+    console.log(JSON.stringify(message));
+    try {
+      const validatedMessage = messageSchema.parse(message);
+    } catch (error) {
+      console.log("Invalid message payload");
+      return;
+    }
+    setNewConversationMessage(message);
   };
 
   if (!stompClient || !currentUser) {
@@ -67,12 +80,11 @@ const DirectMessagePage = () => {
 
   return (
     <section className="flex">
-      <SideNavbar currentUser={currentUser}/>
+      <SideNavbar currentUser={currentUser} />
       <div className="w-full">
-        <DirectMessage stompClient={stompClient} currentUser={currentUser}/>
+        <DirectMessage stompClient={stompClient} currentUser={currentUser} newConversationMessage={newConversationMessage} setNewConversationMessage={setNewConversationMessage}/>
       </div>
     </section>
-    
   );
 };
 

@@ -6,11 +6,14 @@ import Conversation from "../Conversation/Conversation";
 import { Client } from "@stomp/stompjs";
 import { User } from "@/types/user";
 import { Contact } from "@/types/contact";
+import { Message } from "@/types/message";
 
 interface MessagePanelProps {
   stompClient: Client;
   currentUser: User;
   contact: Contact | null;
+  newConversationMessage: Message | null;
+  setNewConversationMessage: (message: Message | null) => void;
 }
 
 const MessagePanel = (props: MessagePanelProps) => {
@@ -46,6 +49,8 @@ const MessagePanel = (props: MessagePanelProps) => {
             contact={props.contact}
             stompClient={props.stompClient}
             currentUser={props.currentUser}
+            newConversationMessage={props.newConversationMessage}
+            setNewConversationMessage={props.setNewConversationMessage}
           />
         </div>
       </div>
