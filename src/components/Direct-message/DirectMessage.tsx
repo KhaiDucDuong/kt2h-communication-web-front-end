@@ -23,26 +23,34 @@ const DirectMessage = (props: DirectMessageProps) => {
   const [hasMoreContacts, setHasMoreContacts] = useState<boolean>(true);
 
   useEffect(() => {
+    let ignore = false;
+
+    const fetchContacts = async () => {
+      if (!hasMoreContacts) return;
+      const res = await fetch(`/direct-message/api/contact?page=${contactPage}`, {
+        method: "GET",
+      });
+      const body = (await res.json()) as ContactResponse;
+      if (!res.ok) {
+        console.log("Failed to fetch contacts");
+      } else {
+        // console.log("Contacts data: ", body);
+        const fetchedContacts = getContactsFromResponse(body);
+        if (fetchedContacts === null || ignore) return;
+        setContacts((prev) => [...prev, ...fetchedContacts]);
+        setContactPage(body.data.meta.page + 1);
+        setHasMoreContacts(body.data.meta.page < body.data.meta.pages);
+      }
+    };
+
     fetchContacts();
+
+    return () => {
+      ignore = true;  
+    }
   }, []);
 
-  const fetchContacts = async () => {
-    if (!hasMoreContacts) return;
-    const res = await fetch(`/direct-message/api/contact?page=${contactPage}`, {
-      method: "GET",
-    });
-    const body = (await res.json()) as ContactResponse;
-    if (!res.ok) {
-      console.log("Failed to fetch contacts");
-    } else {
-      // console.log("Contacts data: ", body);
-      const fetchedContacts = getContactsFromResponse(body);
-      if (fetchedContacts === null) return;
-      setContacts((prev) => [...prev, ...fetchedContacts]);
-      setContactPage(body.data.meta.page + 1);
-      setHasMoreContacts(body.data.meta.page < body.data.meta.pages);
-    }
-  };
+  
   return (
     <section className="flex flex-row size-full">
       <ContactListPanel

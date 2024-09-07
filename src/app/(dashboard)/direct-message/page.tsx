@@ -15,51 +15,67 @@ const DirectMessagePage = () => {
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
 
   useEffect(() => {
-    connectWebSocket();
-  }, []);
+    let ignore = false;
 
-  async function fetchCurrentUser() {
-    const data = await getCurrentUser();
-    if (data) {
-      setCurrentUser(data);
+    async function fetchCurrentUser() {
+      const data = await getCurrentUser();
+      if (data && !ignore) {
+        console.log("Set current user data");
+        setCurrentUser(data);
+      }
+      return data;
     }
-    return data;
-  }
 
-  async function connectWebSocket() {
+    async function connectWebSocket(currentUser: User | null) {
+    
+      if (!currentUser || ignore) return;
+      console.log("Creating STOMP client...");
+      const stompClient = new Client({
+        brokerURL: stompClientUrl,
+      });
+      stompClient.onConnect = function () {
+        // console.log("Successfully connected to STOMP client.");
+        stompClient.subscribe(
+          "/user/" + currentUser.user_id + "/private",
+          onPrivateMessage
+        );
+        console.log(
+          "Successfully subscribe to " +
+            "/user/" +
+            currentUser.user_id +
+            "/private"
+        );
+        setStompClient(stompClient);
+      };
+  
+      stompClient.onStompError = function (frame) {
+        // Will be invoked in case of error encountered at Broker
+        // Bad login/passcode typically will cause an error
+        // Complaint brokers will set `message` header with a brief message. Body may contain details.
+        // Compliant brokers will terminate the connection after any error
+        console.log("Broker reported error: " + frame.headers["message"]);
+        console.log("Additional details: " + frame.body);
+      };
+  
+      stompClient.onDisconnect = function () {
+        console.log("Disconnected from STOMP client.");
+        stompClient?.unsubscribe("/user/" + currentUser?.user_id + "/private");
+        console.log("Unsubscribed from /user/" + currentUser?.user_id + "/private");
+        setStompClient(undefined);
+      };
+  
+      stompClient.activate();
+    }
+
     console.log("Fetching current user...");
-    const currentUser = await fetchCurrentUser();
-    if (!currentUser) return;
-    console.log("Creating STOMP client...");
-    const stompClient = new Client({
-      brokerURL: stompClientUrl,
+    fetchCurrentUser().then((data) => {
+      connectWebSocket(data);
     });
-    stompClient.onConnect = function () {
-      // console.log("Successfully connected to STOMP client.");
-      stompClient.subscribe(
-        "/user/" + currentUser.user_id + "/private",
-        onPrivateMessage
-      );
-      console.log(
-        "Successfully subscribe to " +
-          "/user/" +
-          currentUser.user_id +
-          "/private"
-      );
-      setStompClient(stompClient);
-    };
-
-    stompClient.onStompError = function (frame) {
-      // Will be invoked in case of error encountered at Broker
-      // Bad login/passcode typically will cause an error
-      // Complaint brokers will set `message` header with a brief message. Body may contain details.
-      // Compliant brokers will terminate the connection after any error
-      console.log("Broker reported error: " + frame.headers["message"]);
-      console.log("Additional details: " + frame.body);
-    };
-
-    stompClient.activate();
-  }
+    return () => {
+      ignore = true;
+      stompClient?.deactivate();
+    }
+  }, []);
 
   const onPrivateMessage = (payload: any) => {
     const message = JSON.parse(payload.body) as Message;

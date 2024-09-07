@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { conversationMessages } from "@/utils/constants";
 import ConversationMessage from "../Direct-message/ConversationMessage";
@@ -23,19 +23,19 @@ interface ConversationProps {
 }
 
 const Conversation = (props: ConversationProps) => {
-  const lastMessageRef = useRef<null | HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageGroups, setMessageGroups] = useState<MessageGroup[]>([]);
   const [messagePage, setMessagePage] = useState<number>(1);
   const [hasMoreMessages, setHasMoreMessages] = useState<boolean>(true);
-  const [fetchMoreMessages, setFetchMoreMessages] = useState<boolean>(true);
 
   useEffect(() => {
-    setHasMoreMessages(true);
-    setFetchMoreMessages(true);
-    setMessagePage(1);
-    setMessages([]);
-    setMessageGroups([]);
+    let ignore = false;
+
+    fetchMessages(ignore, 1, props.contact.id);
+
+    return () => {
+      ignore = true;
+    };
   }, [props.contact.id]);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const Conversation = (props: ConversationProps) => {
         } else {
           setMessageGroups((prev) => [
             ...prev,
-            ...groupMessagesFromSameSender([props.newConversationMessage!])
+            ...groupMessagesFromSameSender([props.newConversationMessage!]),
           ]);
         }
         props.setNewConversationMessage(null);
@@ -69,9 +69,9 @@ const Conversation = (props: ConversationProps) => {
     }
   }, [props.newConversationMessage]);
 
-  async function fetchMessages() {
+  async function fetchMessages(ignore: boolean, messagePage: number, contactId: string) {
     const res = await fetch(
-      `/direct-message/api/conversation/message?conversationId=${props.contact.id}&page=${messagePage}`,
+      `/direct-message/api/conversation/message?conversationId=${contactId}&page=${messagePage}`,
       {
         method: "GET",
       }
@@ -80,36 +80,33 @@ const Conversation = (props: ConversationProps) => {
     if (!res.ok) {
       console.log("Failed to fetch messages");
     } else {
+      if (ignore) return;
       console.log("Messages data: ", body);
       const fetchedMessages = getMessagesFromResponse(body);
       if (fetchedMessages === null) return;
-      setMessages((prev) => [...prev, ...fetchedMessages]);
-      setMessageGroups((prev) => [
-        ...prev,
-        ...groupMessagesFromSameSender(fetchedMessages),
-      ]);
+      setMessages(fetchedMessages);
+      setMessageGroups(groupMessagesFromSameSender(fetchedMessages));
       setMessagePage(body.data.meta.page + 1);
       setHasMoreMessages(body.data.meta.page < body.data.meta.pages);
-      setFetchMoreMessages(false);
     }
   }
 
-  if (fetchMoreMessages && hasMoreMessages) {
-    fetchMessages().then(() => {
-      if (lastMessageRef.current !== null) {
-        lastMessageRef.current.scrollIntoView();
-      }
-    });
-  }
+  // useEffect(() => {
+  //   if (lastMessageRef.current !== null) {
+  //     lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [lastMessageRef]);
 
   return (
     <section className="size-full flex flex-col">
+      {props.contact.id}
+      {" Message length: " +messages.length}
       <ScrollArea className="size-full p-[12px]">
         {messageGroups.map((messageGroup, i, { length }) => {
           //last element
-          if (i + 1 === length) {
+          if (i === length - 1) {
             return (
-              <div key={messageGroup.messages.at(0)?.id} ref={lastMessageRef}>
+              <div key={messageGroup.messages.at(0)?.id}>
                 <ConversationMessage
                   sentDateTime={new Date(messageGroup.sentDateTime)}
                   fromUser={
@@ -121,6 +118,8 @@ const Conversation = (props: ConversationProps) => {
                       ? props.contact.requester_nickname
                       : props.contact.to_user_nickname
                   }
+                  senderImage={messageGroup.sender_id === props.currentUser.user_id ? props.currentUser.image : props.contact.to_user_image}
+                  isLastMessage={true}
                 />
               </div>
             );
@@ -138,6 +137,8 @@ const Conversation = (props: ConversationProps) => {
                       ? props.contact.requester_nickname
                       : props.contact.to_user_nickname
                   }
+                  senderImage={messageGroup.sender_id === props.currentUser.user_id ? props.currentUser.image : props.contact.to_user_image}
+                  isLastMessage={false}
                 />
               </div>
             );

@@ -68,7 +68,7 @@ export function groupMessagesFromSameSender(messages: Message[]): MessageGroup[]
     for (const message of messages.toReversed()) {
         if (groupedMessages.length === 0 
             || groupedMessages[groupedMessages.length - 1].sender_id !== message.sender_id 
-            || groupedMessages[groupedMessages.length - 1].sentDateTime.getTime() + 1000 * 60 * 5 > message.sent_at * 1000) {
+            || groupedMessages[groupedMessages.length - 1].sentDateTime.getTime() + 1000 * 60 * 5 < message.sent_at * 1000) {
             groupedMessages.push({
                 sender_id: message.sender_id,
                 messages: [message],
