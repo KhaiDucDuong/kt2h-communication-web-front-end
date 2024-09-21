@@ -1,23 +1,25 @@
 import { cn } from "@/lib/utils";
 import { LucideProps } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
+import { FriendTab } from "./Friends";
 
 const FriendsSidePanelOption = (props: {
-  name: string;
-  url: string;
+  tab: FriendTab;
   isActive: boolean;
   icon: React.ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
   >;
+  setCurrentTab: Dispatch<SetStateAction<FriendTab>>;
 }) => {
+  const {tab, isActive, setCurrentTab} = props;
   return (
-    <Link
+    <div
       className={cn(
         "w-full h-[80px] cursor-pointer hover:bg-dark-1 flex flex-start",
-        props.isActive && "bg-dark-1"
+        isActive && "bg-dark-1"
       )}
-      href={props.url}
+      onClick={()=>{setCurrentTab(tab)}}
     >
       <div className="w-[88%] m-auto flex">
         <div>
@@ -28,9 +30,9 @@ const FriendsSidePanelOption = (props: {
             height={30}
           />
         </div>
-        <p className="text-gray-2 text-[18px]">{props.name}</p>
+        <p className="text-gray-2 text-[18px]">{tab.valueOf()}</p>
       </div>
-    </Link>
+    </div>
   );
 };
 

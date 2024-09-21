@@ -35,9 +35,13 @@ import {
 import Link from "next/link";
 import { logOut } from "@/services/AuthService";
 import { User } from "@/types/user";
+import { DashboardTab } from "@/app/dashboard/page";
+import { Dispatch, SetStateAction } from "react";
 
 interface SideNavbarProps {
   currentUser: User;
+  currentTab: DashboardTab;
+  setCurrentTab: Dispatch<SetStateAction<DashboardTab>>;
 }
 
 const SideNavbar = (props: SideNavbarProps) => {
@@ -205,43 +209,59 @@ const SideNavbar = (props: SideNavbarProps) => {
             </Dialog>
           </div>
 
-          <Link href="/direct-message">
+          <div
+            onClick={() => {
+              props.setCurrentTab(DashboardTab.DIRECT_MESSAGE);
+            }}
+          >
             <CustomIcon
               faIcon={faCommentDots}
               fontSize={26}
-              isSelected={pathname === "/direct-message" ? true : false}
+              isSelected={props.currentTab === DashboardTab.DIRECT_MESSAGE}
             />
-          </Link>
-          <Link href="/group-message">
+          </div>
+          <div
+            onClick={() => {
+              props.setCurrentTab(DashboardTab.GROUP_CHAT);
+            }}
+          >
             <CustomIcon
               faIcon={faUsers}
               fontSize={26}
-              isSelected={pathname === "/group-message" ? true : false}
+              isSelected={props.currentTab === DashboardTab.GROUP_CHAT}
             />
-          </Link>
-          <Link href="/friends/friend-list">
+          </div>
+          <div
+            onClick={() => {
+              props.setCurrentTab(DashboardTab.FRIENDS);
+            }}
+          >
             <CustomIcon
               faIcon={faContactBook}
               fontSize={26}
-              isSelected={pathname.includes("/friends") ? true : false}
+              isSelected={props.currentTab === DashboardTab.FRIENDS}
             />
-          </Link>
-          <Link href="/notifications">
+          </div>
+          <div>
             <CustomIcon
               faIcon={faBell}
               fontSize={26}
               isSelected={pathname === "/notifications" ? true : false}
             />
-          </Link>
+          </div>
         </div>
         <div>
-          <Link href="/settings">
+          <div
+            onClick={() => {
+              props.setCurrentTab(DashboardTab.SETTINGS);
+            }}
+          >
             <CustomIcon
               faIcon={faGear}
               fontSize={26}
-              isSelected={pathname === "/settings" ? true : false}
+              isSelected={props.currentTab === DashboardTab.SETTINGS}
             />
-          </Link>
+          </div>
         </div>
       </div>
     </nav>
