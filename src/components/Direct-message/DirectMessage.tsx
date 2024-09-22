@@ -27,7 +27,7 @@ const DirectMessage = (props: DirectMessageProps) => {
 
     const fetchContacts = async () => {
       if (!hasMoreContacts) return;
-      const res = await fetch(`/direct-message/api/contact?page=${contactPage}`, {
+      const res = await fetch(`/dashboard/api/contact?page=${contactPage}`, {
         method: "GET",
       });
       const body = (await res.json()) as ContactResponse;

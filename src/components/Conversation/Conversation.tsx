@@ -71,7 +71,7 @@ const Conversation = (props: ConversationProps) => {
 
   async function fetchMessages(ignore: boolean, messagePage: number, contactId: string) {
     const res = await fetch(
-      `/direct-message/api/conversation/message?conversationId=${contactId}&page=${messagePage}`,
+      `/dashboard/api/message?conversationId=${contactId}&page=${messagePage}`,
       {
         method: "GET",
       }
