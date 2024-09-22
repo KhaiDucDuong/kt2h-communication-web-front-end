@@ -7,11 +7,23 @@ import { getCurrentUser } from "@/services/UserService";
 import DirectMessage from "@/components/Direct-message/DirectMessage";
 import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
 import { Message, messageSchema } from "@/types/message";
+import Friends from "@/components/Friends/Friends";
 
-const DirectMessagePage = () => {
+export enum DashboardTab {
+  DIRECT_MESSAGE,
+  GROUP_CHAT,
+  SETTINGS,
+  FRIENDS,
+}
+
+const DashboardPage = () => {
+  const [currentTab, setCurrentTab] = useState<DashboardTab>(
+    DashboardTab.DIRECT_MESSAGE
+  );
   const [currentUser, setCurrentUser] = useState<User>();
   const [stompClient, setStompClient] = useState<Client>();
-  const [newConversationMessage, setNewConversationMessage] = useState<Message | null>(null);
+  const [newConversationMessage, setNewConversationMessage] =
+    useState<Message | null>(null);
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
 
   useEffect(() => {
@@ -27,7 +39,6 @@ const DirectMessagePage = () => {
     }
 
     async function connectWebSocket(currentUser: User | null) {
-    
       if (!currentUser || ignore) return;
       console.log("Creating STOMP client...");
       const stompClient = new Client({
@@ -47,7 +58,7 @@ const DirectMessagePage = () => {
         );
         setStompClient(stompClient);
       };
-  
+
       stompClient.onStompError = function (frame) {
         // Will be invoked in case of error encountered at Broker
         // Bad login/passcode typically will cause an error
@@ -56,14 +67,16 @@ const DirectMessagePage = () => {
         console.log("Broker reported error: " + frame.headers["message"]);
         console.log("Additional details: " + frame.body);
       };
-  
+
       stompClient.onDisconnect = function () {
         console.log("Disconnected from STOMP client.");
         stompClient?.unsubscribe("/user/" + currentUser?.user_id + "/private");
-        console.log("Unsubscribed from /user/" + currentUser?.user_id + "/private");
+        console.log(
+          "Unsubscribed from /user/" + currentUser?.user_id + "/private"
+        );
         setStompClient(undefined);
       };
-  
+
       stompClient.activate();
     }
 
@@ -74,7 +87,7 @@ const DirectMessagePage = () => {
     return () => {
       ignore = true;
       stompClient?.deactivate();
-    }
+    };
   }, []);
 
   const onPrivateMessage = (payload: any) => {
@@ -96,12 +109,26 @@ const DirectMessagePage = () => {
 
   return (
     <section className="flex">
-      <SideNavbar currentUser={currentUser} />
+      <SideNavbar
+        currentUser={currentUser}
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
+      />
       <div className="w-full">
-        <DirectMessage stompClient={stompClient} currentUser={currentUser} newConversationMessage={newConversationMessage} setNewConversationMessage={setNewConversationMessage}/>
+        {currentTab === DashboardTab.DIRECT_MESSAGE && (
+          <DirectMessage
+            stompClient={stompClient}
+            currentUser={currentUser}
+            newConversationMessage={newConversationMessage}
+            setNewConversationMessage={setNewConversationMessage}
+          />
+        )}
+        {currentTab === DashboardTab.GROUP_CHAT && <div>group chats</div>}
+        {currentTab === DashboardTab.FRIENDS && <Friends />}
+        {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
       </div>
     </section>
   );
 };
 
-export default DirectMessagePage;
+export default DashboardPage;

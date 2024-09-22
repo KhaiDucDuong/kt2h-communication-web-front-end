@@ -32,7 +32,7 @@ export function middleware(request: NextRequest) {
 
   //go back to direct-message if user has logged in and the request is to an auth url
   if (currentUser && isAuthUrl) {
-    return NextResponse.redirect(new URL("/direct-message", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();

@@ -147,7 +147,7 @@ export async function signIn(
       );
     });
 
-    redirect("/direct-message");
+    redirect("/dashboard");
   } else if (result.statusCode === 401) {
     return { errorMessage: "Username or password is incorrect" };
   }

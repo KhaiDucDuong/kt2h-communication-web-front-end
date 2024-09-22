@@ -1,18 +1,25 @@
 'use client'
  
 import { usePathname } from 'next/navigation'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import FriendsSidePanelOption from './FriendsSidePanelOption'
 import { Contact2Icon, UserPlus2Icon, Users2Icon } from 'lucide-react'
+import { FriendTab } from './Friends'
 
-const FriendSidePanel = () => {
+interface FriendSidePanelProps {
+  currentTab: FriendTab;
+  setCurrentTab: Dispatch<SetStateAction<FriendTab>>;
+}
+
+const FriendSidePanel = (props: FriendSidePanelProps) => {
+  const {currentTab, setCurrentTab} = props;
   const pathname = usePathname()
   return (
     <ScrollArea className="size-full">
-        <FriendsSidePanelOption name="Friend list" url="/friends/friend-list" isActive={pathname==="/friends/friend-list"} icon={Contact2Icon} />
-        <FriendsSidePanelOption name="Friend requests" url="/friends/friend-requests" isActive={pathname==="/friends/friend-requests"} icon={UserPlus2Icon} />
-        <FriendsSidePanelOption name="Group invitations" url="/friends/group-invitations" isActive={pathname==="/friends/group-invitations"} icon={Users2Icon} />
+        <FriendsSidePanelOption tab={FriendTab.FRIEND_LIST} isActive={currentTab===FriendTab.FRIEND_LIST} icon={Contact2Icon} setCurrentTab={setCurrentTab}/>
+        <FriendsSidePanelOption tab={FriendTab.FRIEND_REQUESTS} isActive={currentTab===FriendTab.FRIEND_REQUESTS} icon={UserPlus2Icon} setCurrentTab={setCurrentTab}/>
+        <FriendsSidePanelOption tab={FriendTab.GROUP_INVITATIONS} isActive={currentTab===FriendTab.GROUP_INVITATIONS} icon={Users2Icon} setCurrentTab={setCurrentTab}/>
       <ScrollBar className="custom-scrollbar"/>
     </ScrollArea>
   )

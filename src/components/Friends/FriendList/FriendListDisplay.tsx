@@ -24,7 +24,7 @@ const FriendListDisplay = () => {
     
     let res;
     try {
-      res = await fetch(`/friends/friend-list/api?page=${currentPage}`, {
+      res = await fetch(`/dashboard/api/friend?page=${currentPage}`, {
         method: "GET",
       });
       

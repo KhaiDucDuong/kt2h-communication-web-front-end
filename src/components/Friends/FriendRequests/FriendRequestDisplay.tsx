@@ -43,7 +43,7 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
     try {
       const requestType = props.selectedTab.toString();
       res = await fetch(
-        `/friends/friend-requests/api?page=${currentPage}&type=${requestType}`,
+        `/dashboard/api/friend-request?page=${currentPage}&type=${requestType}`,
         {
           method: "GET",
         }
