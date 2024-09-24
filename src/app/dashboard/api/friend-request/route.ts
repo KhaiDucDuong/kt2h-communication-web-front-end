@@ -59,7 +59,8 @@ export async function PUT(request: NextRequest) {
 
     if(res.status === 200){
       revalidateTag("incomingFriendRequests")
-      console.log("Revalidate `incomingFriendRequests` tag")
+      revalidateTag("conversations")
+      console.log("Revalidate `incomingFriendRequests` & `conversations` tag")
       return NextResponse.json({message: "ok"});
     }
     return NextResponse.error();

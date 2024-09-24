@@ -14,7 +14,7 @@ const OutgoingFriendRequestRow = (props: { request: FriendRequestProps }) => {
   async function deleteFriendRequest() {
     try {
       const res = await fetch(
-        `/friends/friend-requests/api?id=${props.request.id}`,
+        `/dashboard/api/friend-request?id=${props.request.id}`,
         {
           method: "DELETE",
         }
