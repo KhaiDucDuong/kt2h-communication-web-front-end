@@ -56,6 +56,16 @@ const DashboardPage = () => {
             currentUser.user_id +
             "/private"
         );
+        stompClient.subscribe(
+          "/user/" + currentUser.user_id + "/notification",
+          onPrivateMessage
+        );
+        console.log(
+          "Successfully subscribe to " +
+            "/user/" +
+            currentUser.user_id +
+            "/notification"
+        );
         setStompClient(stompClient);
       };
 
@@ -102,6 +112,11 @@ const DashboardPage = () => {
     }
     setNewConversationMessage(message);
   };
+
+  const onNotification = (payload: any) => {
+    console.log("Receive a notification");
+    console.log(JSON.stringify(payload));
+  }
 
   if (!stompClient || !currentUser) {
     return <div>Loading...</div>;

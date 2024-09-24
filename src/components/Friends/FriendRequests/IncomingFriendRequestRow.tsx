@@ -14,7 +14,7 @@ const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
   async function updateRequestStatus(newStatus: RequestStatus) {
     try {
       const res = await fetch(
-        `/friends/friend-requests/api?id=${
+        `/dashboard/api/friend-request?id=${
           props.request.id
         }&status=${newStatus.toString()}`,
         {
