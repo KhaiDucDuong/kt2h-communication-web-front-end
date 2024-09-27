@@ -1,17 +1,17 @@
 "use client";
 import { getFriendRequestSentDateTime } from "@/services/ContactService";
-import { FriendRequestProps, RequestStatus } from "./FriendRequestDisplay";
 import Image from "next/image";
 import { CheckIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import CustomButton from "../CustomButton";
+import { FriendRequest, FriendRequestStatus } from "@/types/friendrequest";
 
-const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
+const IncomingFriendRequestRow = (props: { request: FriendRequest }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [status, setStatus] = useState<RequestStatus>(props.request.status);
+  const [status, setStatus] = useState<FriendRequestStatus>(props.request.status);
 
-  async function updateRequestStatus(newStatus: RequestStatus) {
+  async function updateRequestStatus(newStatus: FriendRequestStatus) {
     try {
       const res = await fetch(
         `/dashboard/api/friend-request?id=${
@@ -73,7 +73,7 @@ const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
         </div>
       </div>
 
-      {status === RequestStatus.PENDING && (
+      {status === FriendRequestStatus.PENDING && (
         <div className="self-center flex flex-row">
           <CustomButton
            isHovered={isHovered}
@@ -82,7 +82,7 @@ const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
             hoverColor="red-1"
             filled={false}
             onClick={() => {
-              updateRequestStatus(RequestStatus.REJECTED);
+              updateRequestStatus(FriendRequestStatus.REJECTED);
             }}
           />
           <div className="w-[15px]"></div>
@@ -93,17 +93,17 @@ const IncomingFriendRequestRow = (props: { request: FriendRequestProps }) => {
             hoverColor="green-400"
             filled={false}
             onClick={() => {
-              updateRequestStatus(RequestStatus.ACCEPTED);
+              updateRequestStatus(FriendRequestStatus.ACCEPTED);
             }}
           /> 
         </div>
       )}
-      {status === RequestStatus.ACCEPTED && (
+      {status === FriendRequestStatus.ACCEPTED && (
         <div className="self-center text-[13px] text-gray-5">
           Accepted Request
         </div>
       )}
-      {status === RequestStatus.REJECTED && (
+      {status === FriendRequestStatus.REJECTED && (
         <div className="self-center text-[13px] text-gray-5">
           Deleted Request
         </div>
