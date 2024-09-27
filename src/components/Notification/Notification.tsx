@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInbox } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "../ui/scroll-area";
+import InvitationNotificationList from "./InvitationNotificationList";
 
 enum NotifcationTab {
   FOR_YOU,
@@ -84,7 +85,9 @@ const Notification = () => {
               Mentions
             </div>
           </div>
-          <ScrollArea className="py-[12px] pl-[16px] pr-[8px] w-[472px]"></ScrollArea>
+          <ScrollArea className="w-[472px] max-h-[60vh]">
+            {selectedTab === NotifcationTab.FOR_YOU && <InvitationNotificationList />}
+          </ScrollArea>
         </PopoverContent>
       </Popover>
     </section>

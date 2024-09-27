@@ -1,5 +1,6 @@
 import { Contact } from "./contact";
 import { MessageType } from "./message";
+import { InvitationNotification } from "./notification";
 import { UserStatus } from "./user";
 
 export interface GenericResponse {
@@ -47,5 +48,11 @@ export interface ConversationMessageResponse extends GenericResponse {
       is_reacted: boolean;
       sent_at: number;
     }[];
+  };
+}
+
+export interface InvitationNotificationResponse extends GenericResponse {
+  data: GenericMetaResponse & {
+    result: InvitationNotification[];
   };
 }
