@@ -10,21 +10,29 @@ import {
   StickerIcon,
   ThumbsUpIcon,
 } from "lucide-react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { Client } from "@stomp/stompjs";
 import { User } from "@/types/user";
+import { SocketContext } from "@/app/dashboard/page";
 
 interface MessageBoxProps {
-  stompClient: Client;
   currentUser: User;
   contactId: string;
 }
 
 const MessageBox = (props: MessageBoxProps) => {
   const [text, setText] = useState<string>("");
+  const context = useContext(SocketContext);
 
   const handleSendMessage = () => {
-    props.stompClient.publish({
+    if (!context || !context?.stompClient) {
+      console.log(
+        "Missiing socket context or stomp client. Cannot send message."
+      );
+      return;
+    }
+    
+    context.stompClient.publish({
       destination: "/app/private-message",
       body: JSON.stringify({
         conversation_id: props.contactId,

@@ -10,7 +10,6 @@ import { Client } from "@stomp/stompjs";
 import { useEffect, useState } from "react";
 
 interface DirectMessageProps {
-  stompClient: Client;
   currentUser: User;
   newConversationMessage: Message | null;
   setNewConversationMessage: (message: Message | null) => void;
@@ -59,7 +58,6 @@ const DirectMessage = (props: DirectMessageProps) => {
         onSelectContact={setSelectedContact}
       />
       <MessagePanel
-        stompClient={props.stompClient}
         currentUser={props.currentUser}
         contact={selectedContact}
         newConversationMessage={props.newConversationMessage}

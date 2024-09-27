@@ -15,7 +15,6 @@ import {
 } from "@/types/message";
 
 interface ConversationProps {
-  stompClient: Client;
   currentUser: User;
   contact: Contact;
   newConversationMessage: Message | null;
@@ -146,7 +145,6 @@ const Conversation = (props: ConversationProps) => {
         })}
       </ScrollArea>
       <MessageBox
-        stompClient={props.stompClient}
         currentUser={props.currentUser}
         contactId={props.contact.id}
       />
