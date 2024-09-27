@@ -5,37 +5,15 @@ import FriendRequestDisplayLoading from "./FriendRequestDisplayLoading";
 import IncomingFriendRequestRow from "./IncomingFriendRequestRow";
 import OutgoingFriendRequestRow from "./OutgoingFriendRequestRow";
 import { useRouter } from "next/navigation";
-
-export interface FriendRequestProps {
-  id: string;
-  sender_id: string;
-  sender_image: string;
-  sender_first_name: string;
-  sender_last_name: string;
-  receiver_id: string;
-  receiver_image: string;
-  receiver_first_name: string;
-  receiver_last_name: string;
-  sent_date_time: number;
-  status: RequestStatus;
-}
-
-export enum RequestStatus {
-  ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
-  PENDING = "PENDING",
-}
+import AddFriend from "./AddFriend";
+import { FriendRequest, FriendRequestStatus } from "@/types/friendrequest";
 
 const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
-  const [incomingRequests, setIncomingRequests] = useState<
-    FriendRequestProps[]
-  >([]);
-  const [outgoingRequests, setOutgoingRequests] = useState<
-    FriendRequestProps[]
-  >([]);
+  const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   async function fetchFriendRequest() {
@@ -48,8 +26,8 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
           method: "GET",
         }
       );
-      
-      if(res.status !== 200) {
+
+      if (res.status !== 200) {
         throw new Error("Failed to fetch friend requests");
       }
 
@@ -86,23 +64,39 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
   return (
     <ScrollArea>
       <section className="size-full flex flex-col">
-        <div className="mb-[10px] w-[96%] h-[40px] pl-[14px] text-gray-2 self-center flex flex-col justify-end">
-          Pending:
-        </div>
-        {props.selectedTab === FriendRequestTab.INCOMING &&
-          incomingRequests.map((request) => {
-            if (request.status === RequestStatus.PENDING.toString())
-              return (
-                <IncomingFriendRequestRow key={request.id} request={request} />
-              );
-          })}
-        {props.selectedTab === FriendRequestTab.OUTGOING &&
-          outgoingRequests.map((request) => {
-            if (request.status === RequestStatus.PENDING.toString())
-              return (
-                <OutgoingFriendRequestRow key={request.id} request={request} />
-              );
-          })}
+        {props.selectedTab === FriendRequestTab.INCOMING && (
+          <div>
+            <div className="mb-[10px] w-[96%] h-[40px] pl-[14px] text-gray-2 self-center flex flex-col justify-end">
+              Pending: {incomingRequests.length}
+            </div>{" "}
+            {incomingRequests.map((request) => {
+              if (request.status === FriendRequestStatus.PENDING.toString())
+                return (
+                  <IncomingFriendRequestRow
+                    key={request.id}
+                    request={request}
+                  />
+                );
+            })}
+          </div>
+        )}
+        {props.selectedTab === FriendRequestTab.OUTGOING && (
+          <div>
+            <div className="mb-[10px] w-[96%] h-[40px] pl-[14px] text-gray-2 self-center flex flex-col justify-end">
+              Pending: {outgoingRequests.length}
+            </div>{" "}
+            {outgoingRequests.map((request) => {
+              if (request.status === FriendRequestStatus.PENDING.toString())
+                return (
+                  <OutgoingFriendRequestRow
+                    key={request.id}
+                    request={request}
+                  />
+                );
+            })}
+          </div>
+        )}
+        {props.selectedTab === FriendRequestTab.ADD_FRIEND && <AddFriend />}
       </section>
     </ScrollArea>
   );
