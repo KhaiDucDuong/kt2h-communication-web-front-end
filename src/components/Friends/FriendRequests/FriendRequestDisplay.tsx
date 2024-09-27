@@ -86,7 +86,7 @@ const FriendRequestDisplay = (props: { selectedTab: FriendRequestTab }) => {
               Pending: {outgoingRequests.length}
             </div>{" "}
             {outgoingRequests.map((request) => {
-              if (request.status === FriendRequestStatus.PENDING.toString())
+              if (request.status === FriendRequestStatus.PENDING.toString() || request.status === FriendRequestStatus.REJECTED.toString())
                 return (
                   <OutgoingFriendRequestRow
                     key={request.id}
