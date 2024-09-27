@@ -29,9 +29,11 @@ const FriendRequestHeader = (props: {
         </div>
         <div
           className={cn(
-            "self-center mr-[12px] cursor-pointer bg-green-700 hover:bg-green-800 transition-colors  px-[6px] py-[2px] rounded-[4px] text-gray-4 "
+            "self-center mr-[12px] bg-green-700 cursor-default transition-colors  px-[6px] py-[2px] rounded-[4px] text-gray-4 ",
+            props.selectedTab !== FriendRequestTab.ADD_FRIEND && "hover:bg-green-800 cursor-pointer ",
+            props.selectedTab === FriendRequestTab.ADD_FRIEND && "bg-dark-4 text-green-700 hover:none "
           )}
-          onClick={() => {}}
+          onClick={() => props.setSelectedTab(FriendRequestTab.ADD_FRIEND)}
         >
           Add Friend
         </div>
