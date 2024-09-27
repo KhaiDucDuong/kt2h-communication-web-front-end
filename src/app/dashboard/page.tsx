@@ -1,13 +1,15 @@
 "use client";
 
 import { Client } from "@stomp/stompjs";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
 import DirectMessage from "@/components/Direct-message/DirectMessage";
 import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
 import { Message, messageSchema } from "@/types/message";
 import Friends from "@/components/Friends/Friends";
+import { InvitationNotification, invitationNotificationSchema } from "@/types/notification";
+import { revalidateIncomingFriendRequestTag, revalidateInvitationNotificationTag } from "@/services/revalidateApiTags";
 
 export enum DashboardTab {
   DIRECT_MESSAGE,
@@ -15,6 +17,10 @@ export enum DashboardTab {
   SETTINGS,
   FRIENDS,
 }
+
+type INotificationSocketContext = { newInvitationNotification : InvitationNotification | null, setNewInvitationNotification : React.Dispatch<React.SetStateAction<InvitationNotification | null>>};
+
+export const NotificationSocketContext = createContext<INotificationSocketContext | null>(null);
 
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState<DashboardTab>(
@@ -24,6 +30,8 @@ const DashboardPage = () => {
   const [stompClient, setStompClient] = useState<Client>();
   const [newConversationMessage, setNewConversationMessage] =
     useState<Message | null>(null);
+  const [newInvitationNotification, setNewInvitationNotification] =
+    useState<InvitationNotification | null>(null);
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
 
   useEffect(() => {
@@ -58,7 +66,7 @@ const DashboardPage = () => {
         );
         stompClient.subscribe(
           "/user/" + currentUser.user_id + "/notification",
-          onPrivateMessage
+          onNotification
         );
         console.log(
           "Successfully subscribe to " +
@@ -114,9 +122,19 @@ const DashboardPage = () => {
   };
 
   const onNotification = (payload: any) => {
+    const notification = JSON.parse(payload.body) as InvitationNotification;
     console.log("Receive a notification");
-    console.log(JSON.stringify(payload));
-  }
+    // console.log(JSON.stringify(payload));
+    try {
+      const validatedNotification = invitationNotificationSchema.parse(notification);
+    } catch (error) {
+      console.log("Invalid notification payload");
+      return;
+    }
+    setNewInvitationNotification(notification);
+    revalidateInvitationNotificationTag();
+    revalidateIncomingFriendRequestTag();
+  };
 
   if (!stompClient || !currentUser) {
     return <div>Loading...</div>;
@@ -129,6 +147,7 @@ const DashboardPage = () => {
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
       />
+      <NotificationSocketContext.Provider value={{newInvitationNotification, setNewInvitationNotification}}>
       <div className="w-full">
         {currentTab === DashboardTab.DIRECT_MESSAGE && (
           <DirectMessage
@@ -142,6 +161,8 @@ const DashboardPage = () => {
         {currentTab === DashboardTab.FRIENDS && <Friends />}
         {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
       </div>
+      </NotificationSocketContext.Provider>
+      
     </section>
   );
 };

@@ -1,13 +1,16 @@
 "use client";
 
+import { NotificationSocketContext } from "@/app/dashboard/page";
 import { getLastSentDisplayDateTime } from "@/services/ContactService";
+import { revalidateIncomingFriendRequestTag, revalidateInvitationNotificationTag } from "@/services/revalidateApiTags";
 import {
   getInvitationNotificationsFromResponse,
   InvitationNotification,
 } from "@/types/notification";
 import { InvitationNotificationResponse } from "@/types/response";
+import { revalidateTag } from "next/cache";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 const InvitationNotificationList = () => {
   const [page, setPage] = useState<number>(1);
@@ -16,6 +19,7 @@ const InvitationNotificationList = () => {
   const [invitationNotifications, setInvitationNotifications] = useState<
     InvitationNotification[]
   >([]);
+  const notificationSocketContext = useContext(NotificationSocketContext);
 
   useEffect(() => {
     let ignore = false;
@@ -47,6 +51,12 @@ const InvitationNotificationList = () => {
       ignore = true;
     };
   }, []);
+
+  useEffect(() => {
+    if(notificationSocketContext === null || notificationSocketContext.newInvitationNotification === null) return;
+    setInvitationNotifications((prev) => [notificationSocketContext.newInvitationNotification!, ...prev])
+    notificationSocketContext.setNewInvitationNotification(null)
+  }, [notificationSocketContext])
 
   const fetchInvitationNotifications = async () => {
     if (!hasMore) return;
