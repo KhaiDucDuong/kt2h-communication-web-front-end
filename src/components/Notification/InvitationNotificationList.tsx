@@ -1,6 +1,6 @@
 "use client";
 
-import { NotificationSocketContext } from "@/app/dashboard/page";
+import { SocketContext } from "@/app/dashboard/page";
 import { getLastSentDisplayDateTime } from "@/services/ContactService";
 import { revalidateIncomingFriendRequestTag, revalidateInvitationNotificationTag } from "@/services/revalidateApiTags";
 import {
@@ -19,7 +19,7 @@ const InvitationNotificationList = () => {
   const [invitationNotifications, setInvitationNotifications] = useState<
     InvitationNotification[]
   >([]);
-  const notificationSocketContext = useContext(NotificationSocketContext);
+  const notificationSocketContext = useContext(SocketContext);
 
   useEffect(() => {
     let ignore = false;
