@@ -8,6 +8,7 @@ import DirectMessage from "@/components/Direct-message/DirectMessage";
 import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
 import { Message, messageSchema } from "@/types/message";
 import Friends from "@/components/Friends/Friends";
+import Groups  from "@/components/Groups/Groups";
 import {
   InvitationNotification,
   invitationNotificationSchema,
@@ -174,7 +175,7 @@ const DashboardPage = () => {
               setNewConversationMessage={setNewConversationMessage}
             />
           )}
-          {currentTab === DashboardTab.GROUP_CHAT && <div>group chats</div>}
+          {currentTab === DashboardTab.GROUP_CHAT && <Groups />}
           {currentTab === DashboardTab.FRIENDS && <Friends />}
           {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
         </div>
