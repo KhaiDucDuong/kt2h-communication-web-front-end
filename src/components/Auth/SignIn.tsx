@@ -1,10 +1,10 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/services/AuthService";
+import { resendActivationMail, signIn } from "@/services/AuthService";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
 function SubmitButton() {
@@ -28,11 +28,39 @@ function SubmitButton() {
 
 const initialState = {
   errorMessage: "",
+  unactivatedEmail: "",
 };
 
 const SignIn = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [state, formAction] = useFormState(signIn, initialState);
+  const [emailResendCoolDown, setEmailResendCoolDown] = useState<number>(0);
+  const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+
+  useEffect(() => {
+    // exit early when we reach 0
+    if (!emailResendCoolDown) return;
+
+    // save intervalId to clear the interval when the
+    // component re-renders
+    const intervalId = setInterval(() => {
+      setEmailResendCoolDown(emailResendCoolDown - 1);
+    }, 1000);
+
+    // clear interval on re-render to avoid memory leaks
+    return () => clearInterval(intervalId);
+    // add timeLeft as a dependency to re-rerun the effect
+    // when we update it
+  }, [emailResendCoolDown]);
+
+  async function onResendClick() {
+    if (state?.unactivatedEmail.length > 0) {
+      setIsSendingEmail(true);
+      const hasSent = await resendActivationMail(state.unactivatedEmail);
+      setIsSendingEmail(false);
+      if (hasSent) setEmailResendCoolDown(30);
+    }
+  }
 
   return (
     <form action={formAction} className="w-fit p-[36px] h-fit max-sm:p-[20px] ">
@@ -44,10 +72,10 @@ const SignIn = () => {
           We&apos;re so excited to see you again!
         </p>
       </div>
-      <div>
-        <div className="flex justify-between mb-[18px] w-[500px] max-sm:w-[310px]">
+      <div className="min-w-[434px]">
+        <div className="flex justify-between mb-[18px] w-full">
           <div
-            className="text-[16px] w-[230px] max-sm:w-[135px] h-[50px] border-[2px] border-gray-7 rounded-[10px] flex justify-center px-[12px] py-[8px]
+            className="text-[16px] w-full h-[50px] border-[2px] border-gray-7 rounded-[10px] flex justify-center px-[12px] py-[8px]
             cursor-pointer hover:border-white"
             onClick={() => {}}
           >
@@ -56,13 +84,13 @@ const SignIn = () => {
               alt="Google icon"
               width={512}
               height={512}
-              className="w-[30px] h-[30px] mr-[10px] m-auto"
+              className="w-[30px] h-[30px] mr-[10px] "
             />{" "}
-            <p className="m-auto text-white">
-              <span className="max-sm:hidden">Login with</span> Google
+            <p className="text-white relative top-[3px]">
+              <span className="max-sm:hidden"></span>Login with Google
             </p>
           </div>
-          <div
+          {/* <div
             className="text-[16px] w-[230px] max-sm:w-[135px] h-[50px] border-[2px] border-gray-7 rounded-[10px] flex justify-center px-[12px] py-[8px]
             cursor-pointer hover:border-white"
             onClick={() => {}}
@@ -77,7 +105,7 @@ const SignIn = () => {
             <p className="m-auto text-white">
               <span className="max-sm:hidden">Login with</span> Facebook
             </p>
-          </div>
+          </div> */}
         </div>
         <div
           className="w-full border-b-[2px] border-gray-7 text-center my-[10px] mb-[20px]
@@ -144,8 +172,50 @@ const SignIn = () => {
             </Link>
           </div>
           <SubmitButton />
-          {state?.errorMessage && (
-            <p className="text-red-1 my-[5px]">{state.errorMessage}</p>
+          {state?.errorMessage &&
+            state?.errorMessage !== "Account is unactivated" && (
+              <p className="text-red-1 my-[5px]">{state.errorMessage}</p>
+            )}
+          {state?.errorMessage === "Account is unactivated" && (
+            // <p className="text-red-1 my-[5px]">hello</p>
+            <div
+              className="border-yellow-400 border-[1px] min-w-full mt-[8px]
+            text-white max-w-[434px] mb-[8px] p-[8px]"
+            >
+              <p className="font-bold mb-[6px]">
+                Your account has not been activated.
+              </p>
+              <p className="mb-[6px]">
+                We've sent an email to{" "}
+                <span className="font-bold">{state.unactivatedEmail}</span>.
+                Please check it to activate your account before logging in.
+              </p>
+              <div className="flex flex-row">
+                <p className="text-[14px] mr-[5px]">
+                  <span className="max-sm:hidden">
+                    Can't find the activation email?{" "}
+                  </span>
+                  Click here to resend.
+                </p>
+                <button
+                  type="button"
+                  className="text-[14px] relative bottom-[1px] bg-blue-2 h-[20px] px-[7px] py-[5px] min-w-[64px] w-fit rounded-md text-white flex flex-row justify-center
+          transition duration-150 ease-out hover:ease-in hover:bg-purple-1 items-center cursor-pointer"
+                  disabled={emailResendCoolDown !== 0 || isSendingEmail}
+                  onClick={() => onResendClick()}
+                >
+                  {isSendingEmail ? (
+                    <span className="dot-flashing"></span>
+                  ) : (
+                    <span>
+                      {emailResendCoolDown === 0
+                        ? "Resend"
+                        : emailResendCoolDown}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
           )}
           <p className="text-white">
             Need an account?{" "}
