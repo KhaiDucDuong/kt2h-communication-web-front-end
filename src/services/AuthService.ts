@@ -93,9 +93,9 @@ export async function signUp(
 }
 
 export async function signIn(
-  prevState: { errorMessage: string },
+  prevState: { errorMessage: string, unactivatedEmail: string },
   formData: FormData
-): Promise<{ errorMessage: string }> {
+): Promise<{ errorMessage: string, unactivatedEmail: string }> {
   const cookieStore = cookies();
   const schema = loginSchema;
 
@@ -109,6 +109,7 @@ export async function signIn(
   if (!parse.success) {
     return {
       errorMessage: "Username or password is not in the correct format",
+      unactivatedEmail: ""
     };
   }
 
@@ -127,7 +128,7 @@ export async function signIn(
     });
   } catch (error) {
     console.log("Error calling sign in api: " + error);
-    return { errorMessage: "Something went wrong: " + error };
+    return { errorMessage: "Something went wrong: " + error, unactivatedEmail: "" };
   }
 
   const result = await response.json();
@@ -149,10 +150,40 @@ export async function signIn(
 
     redirect("/dashboard");
   } else if (result.statusCode === 401) {
-    return { errorMessage: "Username or password is incorrect" };
+    return { errorMessage: "Username or password is incorrect", unactivatedEmail: "" };
+  }
+  else if(result.statusCode === 403 && result.error === "Account is unactivated"){
+    return { errorMessage: "Account is unactivated", unactivatedEmail: result.data.email };
   }
 
-  return { errorMessage: result.error };
+  return { errorMessage: result.error, unactivatedEmail: "" };
+}
+
+export async function resendActivationMail(email: string) {
+  try {
+    console.log("Calling resending activation email api");
+    const response = await fetch(
+      `${process.env.RESEND_ACTIVATION_MAIL_API}?email=${email}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-cache",
+      }
+    );
+
+    if (response.status === 200) {
+      return true;
+    }
+
+    const result = await response.json();
+    console.log("Cannot resend activation email: " + result.error);
+    return false;
+  } catch (error) {
+    console.log("Error calling resending activation email api: " + error);
+    return false;
+  }
 }
 
 interface ActivationAccountResponse {
