@@ -13,17 +13,16 @@ interface GroupListProps {
 
 const GroupList = (props: GroupListProps) =>{
     const { groups, selectedGroup, onSelectGroup } = props;
-
     return (
         
         <ScrollArea className="size-full overflow-visible">
         {
           groups?.map((group) => {
-            return <GroupImgComponent group_id={group.groupid} group_image={group.groupimage} group_owner={group.ownerid} group_name={group.groupname}
+            return <GroupImgComponent key={group.group_id} group_id={group.group_id} group_image={group.group_img} group_owner={group.owner_id} group_name={group.group_name}
             // noMissedMessages={0}
             // isLastMessageFromUser={false}
             // lastMessage={""} lastSent={undefined} 
-            className={selectedGroup?.groupid===group.groupid ? "bg-dark-1 rounded-[8px]" : ""}
+            className={selectedGroup?.group_id===group.group_id ? "bg-dark-1 rounded-[8px]" : ""}
             handleClick={() => onSelectGroup(group)}/>
           })
         }

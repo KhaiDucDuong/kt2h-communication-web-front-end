@@ -175,7 +175,7 @@ const DashboardPage = () => {
               setNewConversationMessage={setNewConversationMessage}
             />
           )}
-          {currentTab === DashboardTab.GROUP_CHAT && <Groups />}
+          {currentTab === DashboardTab.GROUP_CHAT && <Groups currentUser={currentUser}/>}
           {currentTab === DashboardTab.FRIENDS && <Friends />}
           {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
         </div>

@@ -15,8 +15,8 @@ export interface GroupRow {
   }
 
   export interface group {
-    groupid: string;
-    groupname:string,
-    ownerid: string;
-    groupimage: string;
+    group_id: string;
+    group_name:string,
+    owner_id: string;
+    group_img: string;
   }
