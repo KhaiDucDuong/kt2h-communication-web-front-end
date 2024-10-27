@@ -17,27 +17,26 @@ const Groups = (props:GroupsProps) => {
 
     const [selectedGroup, onSelectGroup] = React.useState<group | null>(null);
     const [GroupList,setGroupList] = useState<group[]>([]);
-    async function fetchGroupList() {
+    const fetchGroupList = async () => {
       let res;
       try {
         res = await fetch(`/dashboard/api/groupchat?id=${props.currentUser.user_id}`, {
           method: "GET",
         });
-        
-         if(res.status !== 200) {
-          throw new Error("Failed to groupchat list");
+  
+        if (res.status !== 200) {
+          throw new Error("Failed to fetch group chat list");
         }
   
         const data = await res.json();
         if (data.response.statusCode === 200) {
-          setGroupList(data.response.data);
+          setGroupList(data.response.data); // Set the group list state
         }
-        console.log("Response :" + JSON.stringify(data));
       } catch (error) {
         console.log("Error: " + error);
       }
-  
-    }
+    };
+
     useEffect(() => {
       fetchGroupList();
     }, []);
@@ -50,7 +49,7 @@ const Groups = (props:GroupsProps) => {
             <Notification />
           </div>
           <div className="w-[30vh] border-dark-9 border-[1px] ">
-          <GroupListPanel groups={GroupList} selectedGroup={selectedGroup} onSelectGroup={onSelectGroup} />
+          <GroupListPanel groups={GroupList} selectedGroup={selectedGroup} onSelectGroup={onSelectGroup} onFetchGroups={fetchGroupList} />
           </div>
         </div>
       </section>

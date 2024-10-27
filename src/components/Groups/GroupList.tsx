@@ -9,10 +9,11 @@ interface GroupListProps {
     groups: group[];
     selectedGroup: group | null;
     onSelectGroup: (selectedgroup: group) => void;
+    onFetchGroups: () => Promise<void>;
   }
 
 const GroupList = (props: GroupListProps) =>{
-    const { groups, selectedGroup, onSelectGroup } = props;
+    const { groups, selectedGroup, onSelectGroup,onFetchGroups } = props;
     return (
         
         <ScrollArea className="size-full overflow-visible">
@@ -28,13 +29,7 @@ const GroupList = (props: GroupListProps) =>{
         }
         <ScrollBar className="custom-scrollbar"/>
         <div className="h-[70px] p-[10px]">
-        <GroupAddForm />
-
-      {/* <button 
-        onClick={() => GroupAddForm()}
-        className="w-12 h-12 rounded-full bg-blue-500 text-white flex justify-center items-center shadow-lg hover:bg-blue-600">
-        <span className="pointer-events-none select-none" aria-hidden="true">+</span>
-      </button> */}
+        <GroupAddForm onGroupAdded={onFetchGroups}/>
     </div>
       </ScrollArea>
     )

@@ -23,7 +23,6 @@ export async function GET(request: Request) {
           }
         );
         const response = await res.json();
-        console.log("Groupchat list response: " + JSON.stringify(response));
         return NextResponse.json({ response });
       } catch (error) {
         console.log("Error fetching Groupchat list: " + error);
@@ -33,3 +32,35 @@ export async function GET(request: Request) {
         );
       }
     }
+
+export async function POST(request: NextRequest){
+  const accessToken = await getAccessToken(true);
+    if (!accessToken) {
+        console.log("Faulty access token");
+        return NextResponse.json(
+          { message: "Faulty access token" },
+          { status: 401 }
+        );
+      }
+  try {
+    const data = await request.json()
+    console.log(JSON.stringify(data));
+    const res = await fetch(`${process.env.GROUP_ADD}`,
+      {
+      method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(data)
+    })
+    return NextResponse.json(res)
+  }
+  catch (error) {
+    console.log("Error adding Groupchat: " + error);
+    return NextResponse.json(
+      { message: error },
+      { status: 500 }
+    );
+  }
+}
