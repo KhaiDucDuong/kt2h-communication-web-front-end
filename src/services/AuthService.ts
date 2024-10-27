@@ -316,6 +316,23 @@ export async function getAccessToken(redirectIfFail: boolean = true) {
   return accessToken?.value;
 }
 
+export async function getGoogleLoginConsentPage(){
+  redirect("http://localhost:8080/oauth2/authorization/google")
+}
+
+export async function loginGoogle(state: string, code: string, scope: string, authuser: string, prompt: string){
+  const response = await fetch(
+    `http://localhost:8080/login/oauth2/code/google?state=${state}
+    &code=${code}&scope=${scope}&authuser=${authuser}&prompt=${prompt}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+}
+
 async function setAuthCookies(
   accessToken: string,
   refreshToken: string,

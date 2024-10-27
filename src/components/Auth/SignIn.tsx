@@ -1,11 +1,18 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { resendActivationMail, signIn } from "@/services/AuthService";
+import {
+  getGoogleLoginConsentPage,
+  loginGoogle,
+  resendActivationMail,
+  signIn,
+} from "@/services/AuthService";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -36,6 +43,43 @@ const SignIn = () => {
   const [state, formAction] = useFormState(signIn, initialState);
   const [emailResendCoolDown, setEmailResendCoolDown] = useState<number>(0);
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const access_token = searchParams.get("accesss_token");
+  const refresh_token = searchParams.get("refresh_token");
+
+  useEffect(() => {
+    let ignore = false;
+
+    if (
+      access_token &&
+      refresh_token &&
+      !ignore
+    ) {
+      // loginGoogle(
+      //   oauth2_state,
+      //   oauth2_code,
+      //   oauth2_scope,
+      //   oauth2_authuser,
+      //   oauth2_prompt
+      // );
+      // fetch(
+      //   `http://localhost:8080/login/oauth2/code/google?state=${oauth2_state}
+      //   &code=${oauth2_code}&scope=${oauth2_scope}&authuser=${oauth2_authuser}&prompt=${oauth2_prompt}`,
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+    }
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     // exit early when we reach 0
@@ -75,9 +119,12 @@ const SignIn = () => {
       <div className="min-w-[434px]">
         <div className="flex justify-between mb-[18px] w-full">
           <div
+            // target="_blank"
+            // href={`${process.env.NEXT_PUBLIC_GOOGLE_LOGIN_API}`}
+            // rel="noopener noreferrer"
             className="text-[16px] w-full h-[50px] border-[2px] border-gray-7 rounded-[10px] flex justify-center px-[12px] py-[8px]
             cursor-pointer hover:border-white"
-            onClick={() => {}}
+            onClick={()=>{getGoogleLoginConsentPage()}}
           >
             <Image
               src={"/assets/images/google-512.webp"}
