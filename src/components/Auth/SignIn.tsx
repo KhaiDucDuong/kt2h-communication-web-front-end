@@ -1,11 +1,21 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { resendActivationMail, signIn } from "@/services/AuthService";
+import {
+  getCurrentUserAndRefreshToken,
+  GetCurrentUserAndRefreshTokenMessages,
+  getGoogleLoginConsentPage,
+  resendActivationMail,
+  setAccessTokenCookie,
+  setAuthResultCookie,
+  signIn,
+} from "@/services/AuthService";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -31,11 +41,55 @@ const initialState = {
   unactivatedEmail: "",
 };
 
+export enum AuthResult {
+  INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION = "INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION",
+  COMPLETE_AUTHENTICATION = "COMPLETE_AUTHENTICATION",
+}
+
 const SignIn = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [state, formAction] = useFormState(signIn, initialState);
   const [emailResendCoolDown, setEmailResendCoolDown] = useState<number>(0);
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const token = searchParams.get("token");
+  const auth_result = searchParams.get("auth_result");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function processOauth2Results(token: string, auth_result: string) {
+      await setAccessTokenCookie(token);
+      if (
+        auth_result ===
+        AuthResult.INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION.toString()
+      ) {
+        await setAuthResultCookie(auth_result);
+        router.replace("/oauth2/account-registration");
+      } else if (
+        auth_result === AuthResult.COMPLETE_AUTHENTICATION.toString()
+      ) {
+        const results: GetCurrentUserAndRefreshTokenMessages =
+          await getCurrentUserAndRefreshToken();
+        if (!results.isSuccess) {
+          state.errorMessage =
+            "Oauth2 login failed. Please try again or login using username and password.";
+        } else {
+          router.replace("/dashboard");
+        }
+      }
+    }
+
+    if (token && auth_result && !ignore) {
+      processOauth2Results(token, auth_result);
+    }
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     // exit early when we reach 0
@@ -75,9 +129,14 @@ const SignIn = () => {
       <div className="min-w-[434px]">
         <div className="flex justify-between mb-[18px] w-full">
           <div
+            // target="_blank"
+            // href={`${process.env.NEXT_PUBLIC_GOOGLE_LOGIN_API}`}
+            // rel="noopener noreferrer"
             className="text-[16px] w-full h-[50px] border-[2px] border-gray-7 rounded-[10px] flex justify-center px-[12px] py-[8px]
             cursor-pointer hover:border-white"
-            onClick={() => {}}
+            onClick={() => {
+              getGoogleLoginConsentPage();
+            }}
           >
             <Image
               src={"/assets/images/google-512.webp"}
