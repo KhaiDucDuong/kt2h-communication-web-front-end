@@ -1,6 +1,8 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import {
+  getCurrentUserAndRefreshToken,
+  GetCurrentUserAndRefreshTokenMessages,
   getGoogleLoginConsentPage,
   resendActivationMail,
   setAccessTokenCookie,
@@ -60,15 +62,23 @@ const SignIn = () => {
 
     async function processOauth2Results(token: string, auth_result: string) {
       await setAccessTokenCookie(token);
-      await setAuthResultCookie(auth_result);
       if (
         auth_result ===
         AuthResult.INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION.toString()
       ) {
+        await setAuthResultCookie(auth_result);
         router.replace("/oauth2/account-registration");
       } else if (
         auth_result === AuthResult.COMPLETE_AUTHENTICATION.toString()
       ) {
+        const results: GetCurrentUserAndRefreshTokenMessages =
+          await getCurrentUserAndRefreshToken();
+        if (!results.isSuccess) {
+          state.errorMessage =
+            "Oauth2 login failed. Please try again or login using username and password.";
+        } else {
+          router.replace("/dashboard");
+        }
       }
     }
 
