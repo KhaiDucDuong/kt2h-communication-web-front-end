@@ -5,7 +5,7 @@ import { GroupProp } from "@/types/group";
 import React from "react";
 
 const GroupImgComponent = (props: GroupProp) => {
-        const {  group_image,group_name,group_owner,group_id } = props;
+        const {group_image,group_name,group_owner,group_id } = props;
         const [isHovered, setIsHovered] = React.useState(false);
 
     return(

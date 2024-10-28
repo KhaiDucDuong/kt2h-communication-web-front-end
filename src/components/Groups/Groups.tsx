@@ -1,26 +1,45 @@
 "use client";
 
 import SearchBar from "@/components/Direct-message/SearchBar"; 
-import { useState } from "react";
 import Notification from "../Notification/Notification";
 import GroupListPanel from "./GroupListPanel";
 import { group }  from "@/types/group"
-import React from "react";
- 
+import { User } from "@/types/user";import React from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getAccessToken } from "@/services/AuthService";
 interface GroupsProps {
-    groups: group[];
-    selectedGroup: group | null;
-    onSelectGroup: (selectedgroup: group) => void;
-  }
-  const GroupTest: group[] = [
-    { groupid: "1", groupname: 'Nhom hoc', ownerid: 'Tien' ,groupimage:'/assets/images/profile-pic.jpg'},
-    { groupid: "2", groupname: 'Nhom quay', ownerid: 'Hoang',groupimage:'/assets/images/profile-pic.jpg' },
-    { groupid: "3", groupname: 'Nhom suy', ownerid: 'Khai' ,groupimage:'/assets/images/profile-pic.jpg'},
-    { groupid: "4", groupname: 'Nhom game', ownerid: 'Lan',groupimage:'/assets/images/profile-pic.jpg' },
-  ];
-const Groups = (props: GroupsProps) => {
-    // const { groups, selectedGroup, onSelectGroup } = props;
+  currentUser: User;
+}
+  
+
+const Groups = (props:GroupsProps) => {
+
     const [selectedGroup, onSelectGroup] = React.useState<group | null>(null);
+    const [GroupList,setGroupList] = useState<group[]>([]);
+    const fetchGroupList = async () => {
+      let res;
+      try {
+        res = await fetch(`/dashboard/api/groupchat?id=${props.currentUser.user_id}`, {
+          method: "GET",
+        });
+  
+        if (res.status !== 200) {
+          throw new Error("Failed to fetch group chat list");
+        }
+  
+        const data = await res.json();
+        if (data.response.statusCode === 200) {
+          setGroupList(data.response.data); // Set the group list state
+        }
+      } catch (error) {
+        console.log("Error: " + error);
+      }
+    };
+
+    useEffect(() => {
+      fetchGroupList();
+    }, []);
     return (
         <section className="flex flex-row size-full ">
       <section className="flex flex-col w-[486px] bg-dark-9 max-lg:w-[330px]">
@@ -30,7 +49,7 @@ const Groups = (props: GroupsProps) => {
             <Notification />
           </div>
           <div className="w-[30vh] border-dark-9 border-[1px] ">
-          <GroupListPanel groups={GroupTest} selectedGroup={selectedGroup} onSelectGroup={onSelectGroup} />
+          <GroupListPanel groups={GroupList} selectedGroup={selectedGroup} onSelectGroup={onSelectGroup} onFetchGroups={fetchGroupList} />
           </div>
         </div>
       </section>
