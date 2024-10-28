@@ -16,3 +16,12 @@ export const loginSchema = z.object({
     username: z.string().min(5),
     password: z.string().min(8),
 })
+
+export const oauth2AccountRegistrationSchema = z.object({
+    username: z.string().min(5, {message: "Username must be between 5 and 50 characters"}).max(50, {message: "Username must be between 5 and 50 characters"}),
+    password: z.string().min(8, {message: "Password must be at least 8 characters long"}),
+    confirm_password: z.string()
+}).refine((data) => data.password === data.confirm_password, {
+    message: "Passwords don't match",
+    path: ["confirm_password"],
+})

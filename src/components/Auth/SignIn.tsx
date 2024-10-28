@@ -2,8 +2,9 @@
 import { Input } from "@/components/ui/input";
 import {
   getGoogleLoginConsentPage,
-  loginGoogle,
   resendActivationMail,
+  setAccessTokenCookie,
+  setAuthResultCookie,
   signIn,
 } from "@/services/AuthService";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -38,6 +39,11 @@ const initialState = {
   unactivatedEmail: "",
 };
 
+export enum AuthResult {
+  INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION = "INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION",
+  COMPLETE_AUTHENTICATION = "COMPLETE_AUTHENTICATION",
+}
+
 const SignIn = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [state, formAction] = useFormState(signIn, initialState);
@@ -46,34 +52,28 @@ const SignIn = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const access_token = searchParams.get("accesss_token");
-  const refresh_token = searchParams.get("refresh_token");
+  const token = searchParams.get("token");
+  const auth_result = searchParams.get("auth_result");
 
   useEffect(() => {
     let ignore = false;
 
-    if (
-      access_token &&
-      refresh_token &&
-      !ignore
-    ) {
-      // loginGoogle(
-      //   oauth2_state,
-      //   oauth2_code,
-      //   oauth2_scope,
-      //   oauth2_authuser,
-      //   oauth2_prompt
-      // );
-      // fetch(
-      //   `http://localhost:8080/login/oauth2/code/google?state=${oauth2_state}
-      //   &code=${oauth2_code}&scope=${oauth2_scope}&authuser=${oauth2_authuser}&prompt=${oauth2_prompt}`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
+    async function processOauth2Results(token: string, auth_result: string) {
+      await setAccessTokenCookie(token);
+      await setAuthResultCookie(auth_result);
+      if (
+        auth_result ===
+        AuthResult.INCOMPLETE_REQUIRE_ACCOUNT_REGISTRATION.toString()
+      ) {
+        router.replace("/oauth2/account-registration");
+      } else if (
+        auth_result === AuthResult.COMPLETE_AUTHENTICATION.toString()
+      ) {
+      }
+    }
+
+    if (token && auth_result && !ignore) {
+      processOauth2Results(token, auth_result);
     }
 
     return () => {
@@ -124,7 +124,9 @@ const SignIn = () => {
             // rel="noopener noreferrer"
             className="text-[16px] w-full h-[50px] border-[2px] border-gray-7 rounded-[10px] flex justify-center px-[12px] py-[8px]
             cursor-pointer hover:border-white"
-            onClick={()=>{getGoogleLoginConsentPage()}}
+            onClick={() => {
+              getGoogleLoginConsentPage();
+            }}
           >
             <Image
               src={"/assets/images/google-512.webp"}
