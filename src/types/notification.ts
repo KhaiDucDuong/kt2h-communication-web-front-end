@@ -5,7 +5,26 @@ import { InvitationNotificationResponse } from "./response";
 export interface InvitationNotification {
   id: string;
   sent_date_time: number;
+  type: InvitationNotificationType;
   friend_request: FriendRequest;
+}
+
+export interface SocketInvitationNotification {
+  socket_event: NotificationSocketEvent;
+  invitation_notification: InvitationNotification;
+}
+
+export enum NotificationSocketEvent {
+  RECEIVE_FRIEND_REQUEST,
+  RECEIVER_ACCEPT_FRIEND_REQUEST,
+  SENDER_DELETE_FRIEND_REQUEST,
+}
+
+export enum InvitationNotificationType {
+  FRIEND_REQUEST_ACCEPTED,
+  FRIEND_REQUEST_RECEIVED,
+  GROUP_INVITATION_ACCEPTED,
+  GROUP_INVITATION_RECEIVED,
 }
 
 export const invitationNotificationSchema: z.ZodType<InvitationNotification> =
@@ -13,6 +32,13 @@ export const invitationNotificationSchema: z.ZodType<InvitationNotification> =
     id: z.string().uuid(),
     sent_date_time: z.number(),
     friend_request: friendRequestSchema,
+    type: z.nativeEnum(InvitationNotificationType),
+  });
+
+export const socketInvitationNotificationSchema: z.ZodType<SocketInvitationNotification> =
+  z.object({
+    socket_event: z.nativeEnum(NotificationSocketEvent),
+    invitation_notification: invitationNotificationSchema,
   });
 
 export function getInvitationNotificationsFromResponse(

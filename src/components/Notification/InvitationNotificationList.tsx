@@ -2,15 +2,21 @@
 
 import { SocketContext } from "@/app/dashboard/page";
 import { getLastSentDisplayDateTime } from "@/services/ContactService";
-import { revalidateIncomingFriendRequestTag, revalidateInvitationNotificationTag } from "@/services/revalidateApiTags";
+import {
+  revalidateIncomingFriendRequestTag,
+  revalidateInvitationNotificationTag,
+} from "@/services/revalidateApiTags";
 import {
   getInvitationNotificationsFromResponse,
   InvitationNotification,
+  InvitationNotificationType,
+  NotificationSocketEvent,
 } from "@/types/notification";
 import { InvitationNotificationResponse } from "@/types/response";
 import { revalidateTag } from "next/cache";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
+import ReceiveFriendRequestNotification from "./ReceiveFriendRequestNotification";
 
 const InvitationNotificationList = () => {
   const [page, setPage] = useState<number>(1);
@@ -53,10 +59,64 @@ const InvitationNotificationList = () => {
   }, []);
 
   useEffect(() => {
-    if(notificationSocketContext === null || notificationSocketContext.newInvitationNotification === null) return;
-    setInvitationNotifications((prev) => [notificationSocketContext.newInvitationNotification!, ...prev])
-    notificationSocketContext.setNewInvitationNotification(null)
-  }, [notificationSocketContext])
+    if (
+      notificationSocketContext === null ||
+      notificationSocketContext.newSocketInvitationNotifications.length > 0
+    )
+      return;
+    const socketIntivationNotifications =
+      notificationSocketContext.newSocketInvitationNotifications
+        .filter(
+          (socketNotifications) =>
+            socketNotifications.socket_event ===
+              NotificationSocketEvent.RECEIVER_ACCEPT_FRIEND_REQUEST ||
+            NotificationSocketEvent.RECEIVE_FRIEND_REQUEST ||
+            NotificationSocketEvent.SENDER_DELETE_FRIEND_REQUEST
+        )
+        .sort(
+          (a, b) =>
+            a.invitation_notification.sent_date_time -
+            b.invitation_notification.sent_date_time
+        );
+
+    let updatedInvitationNotificationList = invitationNotifications;
+    socketIntivationNotifications.forEach((socketNotification) => {
+      switch (socketNotification.socket_event) {
+        case NotificationSocketEvent.RECEIVE_FRIEND_REQUEST:
+          updatedInvitationNotificationList.push(
+            socketNotification.invitation_notification
+          );
+          break;
+        case NotificationSocketEvent.RECEIVER_ACCEPT_FRIEND_REQUEST:
+          updatedInvitationNotificationList =
+            updatedInvitationNotificationList.map((notification) => {
+              return notification.id ===
+                socketNotification.invitation_notification.id
+                ? socketNotification.invitation_notification
+                : notification;
+            });
+          break;
+        case NotificationSocketEvent.SENDER_DELETE_FRIEND_REQUEST:
+          updatedInvitationNotificationList =
+            updatedInvitationNotificationList.filter(
+              (notification) =>
+                notification.id !==
+                socketNotification.invitation_notification.id
+            );
+          break;
+      }
+
+      setInvitationNotifications(updatedInvitationNotificationList);
+      notificationSocketContext.setSocketNewInvitationNotifications(
+        notificationSocketContext.newSocketInvitationNotifications.filter(
+          (originalSocketNotification) =>
+            !socketIntivationNotifications.includes(originalSocketNotification)
+        )
+      );
+    });
+    // setInvitationNotifications((prev) => [...notificationSocketContext.newInvitationNotifications!, ...prev])
+    // notificationSocketContext.setNewInvitationNotifications((prev)=> prev.filter((notification)=> notification.id !== ))
+  }, [notificationSocketContext]);
 
   const fetchInvitationNotifications = async () => {
     if (!hasMore) return;
@@ -82,45 +142,13 @@ const InvitationNotificationList = () => {
   return (
     <div>
       {invitationNotifications.map((notification) => {
-        return (
-          <div
-            key={notification.id}
-            className="py-[12px] pl-[16px] pr-[8px] flex flex-row cursor-pointer hover:bg-dark-8"
-          >
-            <div>
-              <Image
-                src={
-                  notification.friend_request.sender_image !== null
-                    ? notification.friend_request.sender_image
-                    : "/assets/images/profile-pic.jpg"
-                }
-                width={100}
-                height={100}
-                alt={`${notification.friend_request.sender_first_name}&apos;s profile image`}
-                className="w-[40px] h-[40px] rounded-full mr-[12px]"
-              />
-            </div>
-            <div className="w-full h-fit">
-              <div className="text-gray-3">
-                <span className="text-gray-2">{`${notification.friend_request.sender_last_name} ${notification.friend_request.sender_first_name}`}</span>{" "}
-                sent you a friend request.
-              </div>
-              <div className="text-gray-3 text-[12px]">
-                {getLastSentDisplayDateTime(
-                  new Date(notification.sent_date_time * 1000)
-                )}
-              </div>
-              <div className="flex flex-row mt-[2px]">
-                <button className="mr-[12px] px-[16px] py-[7px] bg-green-700 hover:bg-green-800 transition rounded-[3px] text-white text-[14px]">
-                  Accept
-                </button>
-                <button className="px-[16px] py-[7px] bg-gray-9 hover:bg-gray-10 text-white rounded-[3px] transition text-[14px]">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        );
+        if (
+          notification.type ===
+          InvitationNotificationType.FRIEND_REQUEST_RECEIVED
+        )
+          return (
+            <ReceiveFriendRequestNotification notification={notification} />
+          );
       })}
     </div>
   );
