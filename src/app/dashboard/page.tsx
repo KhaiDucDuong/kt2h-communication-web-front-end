@@ -12,12 +12,15 @@ import Groups from "@/components/Groups/Groups";
 import {
   InvitationNotification,
   invitationNotificationSchema,
+  NotificationSocketEvent,
   SocketInvitationNotification,
   socketInvitationNotificationSchema,
 } from "@/types/notification";
 import {
+  revalidateAllTags,
   revalidateIncomingFriendRequestTag,
   revalidateInvitationNotificationTag,
+  revalidateOutgoingFriendRequestTag,
 } from "@/services/revalidateApiTags";
 
 export enum DashboardTab {
@@ -49,9 +52,10 @@ const DashboardPage = () => {
   const [stompClient, setStompClient] = useState<Client>();
   const [newConversationMessage, setNewConversationMessage] =
     useState<Message | null>(null);
-  const [newSocketInvitationNotifications, setSocketNewInvitationNotifications] = useState<
-  SocketInvitationNotification[]
-  >([]);
+  const [
+    newSocketInvitationNotifications,
+    setSocketNewInvitationNotifications,
+  ] = useState<SocketInvitationNotification[]>([]);
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
 
   useEffect(() => {
@@ -142,7 +146,9 @@ const DashboardPage = () => {
   };
 
   const onNotification = (payload: any) => {
-    const notification = JSON.parse(payload.body) as SocketInvitationNotification;
+    const notification = JSON.parse(
+      payload.body
+    ) as SocketInvitationNotification;
     console.log("Receive a notification");
     // console.log(JSON.stringify(payload));
     try {
@@ -154,11 +160,18 @@ const DashboardPage = () => {
     }
     setSocketNewInvitationNotifications((prev) => [...prev, notification]);
     revalidateInvitationNotificationTag();
-    revalidateIncomingFriendRequestTag();
+    notification.socket_event === NotificationSocketEvent.RECEIVE_FRIEND_REQUEST
+      ? revalidateIncomingFriendRequestTag()
+      : revalidateOutgoingFriendRequestTag();
   };
 
   if (!stompClient || !currentUser) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        Loading...{" "}
+        {"Stomp: " + String(stompClient) + " User: " + String(currentUser)}
+      </div>
+    );
   }
 
   return (

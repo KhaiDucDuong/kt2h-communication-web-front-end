@@ -7,7 +7,7 @@ const SearchBar = (props: {
   placeHolder: string
 }) => {
   return (
-    <section className="flex flex-col justify-center m-auto size-full ">
+    <section className="flex flex-col justify-center m-auto size-full">
       <div className=" flex relative justify-start mx-[5%]">
         <FontAwesomeIcon icon={faSearch} className="text-gray-1 absolute top-[30%] left-[14px] hover:text-gray-50 cursor-pointer" 
         onClick={() => {}}/>

@@ -16,7 +16,7 @@ import {
 import { faL } from "@fortawesome/free-solid-svg-icons";
 import { access } from "fs";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 // export const accessTokenCookieName = "access_token";
 // export const refreshTokenCookieName = "refresh_token";
@@ -278,7 +278,7 @@ export async function logOut(isRedirect: boolean = true) {
   cookieStore.delete(accessTokenCookieName);
   cookieStore.delete(userSessionCookieName);
   if (isRedirect) {
-    redirect("/");
+    redirect("/", RedirectType.push);
   }
 }
 
@@ -287,9 +287,11 @@ export async function getAccessToken(redirectIfFail: boolean = true) {
   let accessToken = cookieStore.get("access_token");
 
   if (accessToken === undefined) {
+    console.log("No access token *****************")
     //use refresh token
     const refreshToken = cookieStore.get("refresh_token");
     if (refreshToken === undefined) {
+    console.log("No refresh token *****************")
       await logOut(redirectIfFail);
       return;
     }
@@ -462,10 +464,7 @@ export async function getCurrentUserAndRefreshToken(): Promise<GetCurrentUserAnd
       );
     });
 
-    return {
-      errors: [],
-      isSuccess: true,
-    };
+    redirect("/dashboard");
   }
 
   return {
