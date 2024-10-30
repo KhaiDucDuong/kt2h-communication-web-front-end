@@ -31,7 +31,7 @@ export async function GET(
           Authorization: `Bearer ${accessToken}`,
         },
         next: {
-          revalidate: 60,
+          revalidate: 300,
           tags: [`invitationNotifications`],
         },
       }

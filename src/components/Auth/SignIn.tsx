@@ -51,6 +51,7 @@ const SignIn = () => {
   const [state, formAction] = useFormState(signIn, initialState);
   const [emailResendCoolDown, setEmailResendCoolDown] = useState<number>(0);
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+  const [oauth2Error, setOauth2Error] = useState<string>("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -73,11 +74,10 @@ const SignIn = () => {
       ) {
         const results: GetCurrentUserAndRefreshTokenMessages =
           await getCurrentUserAndRefreshToken();
-        if (!results.isSuccess) {
-          state.errorMessage =
-            "Oauth2 login failed. Please try again or login using username and password.";
-        } else {
-          router.replace("/dashboard");
+        if (results && !results.isSuccess) {
+          setOauth2Error(
+            "Oauth2 login failed. Please try again or login using username and password."
+          );
         }
       }
     }
@@ -235,6 +235,7 @@ const SignIn = () => {
             state?.errorMessage !== "Account is unactivated" && (
               <p className="text-red-1 my-[5px]">{state.errorMessage}</p>
             )}
+          {oauth2Error && <p className="text-red-1 my-[5px]">{oauth2Error}</p>}
           {state?.errorMessage === "Account is unactivated" && (
             // <p className="text-red-1 my-[5px]">hello</p>
             <div
