@@ -20,6 +20,10 @@ export async function GET(request: Request) {
               "Content-Type": "application/json",
               Authorization: `Bearer ${accessToken}`,
             },
+            next: {
+              revalidate: 60,
+              tags: ["groupChats"]
+            },
           }
         );
         const response = await res.json();
