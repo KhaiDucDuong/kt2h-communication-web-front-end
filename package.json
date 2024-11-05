@@ -27,13 +27,14 @@
     "next": "14.2.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "sharp": "^0.33.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "ws": "^8.18.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^20.17.0",
+    "@types/node": "^20.17.5",
     "@types/prop-types": "^15.7.13",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

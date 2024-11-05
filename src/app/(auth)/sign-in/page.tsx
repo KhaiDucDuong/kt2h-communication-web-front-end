@@ -1,6 +1,5 @@
-
 import SignIn from "@/components/Auth/SignIn";
-import Image from "next/image";
+import { Suspense } from "react";
 
 export default function SignInPage() {
   return (
@@ -8,7 +7,9 @@ export default function SignInPage() {
       className=" bg-gray-8 flex flex-row justify-center
     rounded-[15px] "
     >
-      <SignIn />
+      <Suspense fallback={<div className="loader"></div>}>
+        <SignIn />
+      </Suspense>
     </section>
   );
 }

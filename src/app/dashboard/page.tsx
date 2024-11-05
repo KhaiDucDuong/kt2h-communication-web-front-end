@@ -22,27 +22,8 @@ import {
   revalidateInvitationNotificationTag,
   revalidateOutgoingFriendRequestTag,
 } from "@/services/revalidateApiTags";
-
-export enum DashboardTab {
-  DIRECT_MESSAGE,
-  GROUP_CHAT,
-  SETTINGS,
-  FRIENDS,
-}
-
-type ISocketContext = {
-  stompClient: Client | undefined;
-  newConversationMessage: Message | null;
-  setNewConversationMessage: React.Dispatch<
-    React.SetStateAction<Message | null>
-  >;
-  newSocketInvitationNotifications: SocketInvitationNotification[];
-  setSocketNewInvitationNotifications: React.Dispatch<
-    React.SetStateAction<SocketInvitationNotification[]>
-  >;
-};
-
-export const SocketContext = createContext<ISocketContext | null>(null);
+import { DashboardTab } from "@/types/ui";
+import { SocketContext } from "@/types/context";
 
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState<DashboardTab>(
@@ -69,6 +50,7 @@ const DashboardPage = () => {
       }
       return data;
     }
+
 
     async function connectWebSocket(currentUser: User | null) {
       if (!currentUser || ignore) return;
@@ -124,13 +106,16 @@ const DashboardPage = () => {
 
     console.log("Fetching current user...");
     fetchCurrentUser().then((data) => {
-      connectWebSocket(data);
+      if (data && !ignore) {
+        connectWebSocket(data);
+      }
     });
     return () => {
       ignore = true;
       stompClient?.deactivate();
     };
   }, []);
+  
 
   const onPrivateMessage = (payload: any) => {
     const message = JSON.parse(payload.body) as Message;

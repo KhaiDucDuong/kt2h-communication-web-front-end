@@ -87,7 +87,7 @@ const GroupImgComponent = (props: GroupProp & { onGroupUpdated: () => Promise<vo
           <ContextMenu>
           <ContextMenuTrigger>
             <Image
-              src={props.group_image ? props.group_image :{group_image}}
+              src={props.group_image ? props.group_image : "/assets/images/group-chat-default.png"}
               alt="contact's image"
               width={50}
               height={50}

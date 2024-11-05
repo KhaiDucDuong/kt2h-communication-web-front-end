@@ -30,7 +30,7 @@ export function GroupAddForm({onGroupAdded}:GroupAddFormProps) {
     }
     return data;
   }
-  async function handleCreateGroup(event) {
+  async function handleCreateGroup(event: React.FormEvent) {
       event.preventDefault();
       const  user = await fetchCurrentUser();
       const Groupdata = {
@@ -65,7 +65,7 @@ export function GroupAddForm({onGroupAdded}:GroupAddFormProps) {
         <DialogHeader>
           <DialogTitle>Create new group</DialogTitle>
           <DialogDescription className ="text-white">
-            Click create when you're done.
+            Click create when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleCreateGroup}>

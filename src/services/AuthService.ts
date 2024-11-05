@@ -125,7 +125,7 @@ export async function signIn(
 
   let response;
   try {
-    response = await fetch(`${process.env.LOGIN_API}`, {
+    response = await fetch(`${global.process.env.LOGIN_API}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
