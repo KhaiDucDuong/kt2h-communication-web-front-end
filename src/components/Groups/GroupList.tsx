@@ -5,6 +5,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import GroupImgComponent from "./GroupImgComponent";
 import { group }  from "@/types/group"
 import GroupAddForm from "./GroupAddForm";
+
 interface GroupListProps {
     groups: group[];
     selectedGroup: group | null;
@@ -19,7 +20,7 @@ const GroupList = (props: GroupListProps) =>{
         <ScrollArea className="size-full overflow-visible">
         {
           groups?.map((group) => {
-            return <GroupImgComponent key={group.group_id} group_id={group.group_id} group_image={group.group_img} group_owner={group.owner_id} group_name={group.group_name}
+            return <GroupImgComponent key={group.group_id} group_id={group.group_id} group_image={group.group_img} group_owner={group.owner_id} group_name={group.group_name} onGroupUpdated={onFetchGroups}
             // noMissedMessages={0}
             // isLastMessageFromUser={false}
             // lastMessage={""} lastSent={undefined} 

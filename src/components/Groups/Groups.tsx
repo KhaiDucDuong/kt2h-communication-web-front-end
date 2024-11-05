@@ -42,12 +42,15 @@ const Groups = (props:GroupsProps) => {
     }, []);
     return (
         <section className="flex flex-row size-full ">
-      <section className="flex flex-col w-[486px] bg-dark-9 max-lg:w-[330px]">
+      <section className="flex flex-col w-[366px] bg-dark-9 max-lg:w-[330px]">
         <div className="h-[98px] w-[full] ">
           <div className="h-[98px] flex flex-row">
             <SearchBar placeHolder="Find a group" />
             <Notification />
+            
           </div>
+          <div className="relative flex w-full border-dark-10 border-[1px] "></div>
+
           <div className="w-[30vh] border-dark-9 border-[1px] ">
           <GroupListPanel groups={GroupList} selectedGroup={selectedGroup} onSelectGroup={onSelectGroup} onFetchGroups={fetchGroupList} />
           </div>
