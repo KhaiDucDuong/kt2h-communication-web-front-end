@@ -18,7 +18,6 @@ interface GroupAddFormProps {
 }
 
 export function GroupAddForm({onGroupAdded}:GroupAddFormProps) {
-  console.log('Received onGroupAdded:', onGroupAdded); // Debugging line
   const [Groupname, setgroupName] = useState('');
   const [open, setOpen] = useState(false);
 
@@ -77,7 +76,6 @@ export function GroupAddForm({onGroupAdded}:GroupAddFormProps) {
             </span>
             <input
               required id="Groupname"
-              defaultValue="Pedro Duarte"
               onChange={(e) => setgroupName(e.target.value)}
               className="col-span-3 bg-dark-6 ring-0 border-0"
             />
