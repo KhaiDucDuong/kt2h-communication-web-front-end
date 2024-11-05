@@ -1,13 +1,13 @@
 "use client";
 import { getFriendRequestSentDateTime } from "@/services/ContactService";
-import { FriendRequestProps } from "./FriendRequestDisplay";
 import Image from "next/image";
 import { XIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import CustomButton from "../CustomButton";
+import { FriendRequest } from "@/types/friendrequest";
 
-const OutgoingFriendRequestRow = (props: { request: FriendRequestProps }) => {
+const OutgoingFriendRequestRow = (props: { request: FriendRequest }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
 

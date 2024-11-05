@@ -3,3 +3,10 @@ export enum FriendRequestTab {
   OUTGOING = "OUTGOING",
   ADD_FRIEND = "ADD_FRIEND"
 }
+
+export enum DashboardTab {
+  DIRECT_MESSAGE,
+  GROUP_CHAT,
+  SETTINGS,
+  FRIENDS,
+}

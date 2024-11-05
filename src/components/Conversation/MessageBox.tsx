@@ -13,7 +13,7 @@ import {
 import { ChangeEvent, useContext, useState } from "react";
 import { Client } from "@stomp/stompjs";
 import { User } from "@/types/user";
-import { SocketContext } from "@/app/dashboard/page";
+import { SocketContext } from "@/types/context";
 
 interface MessageBoxProps {
   currentUser: User;

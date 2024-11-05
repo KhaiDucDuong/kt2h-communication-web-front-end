@@ -1,6 +1,5 @@
 "use client";
 
-import { SocketContext } from "@/app/dashboard/page";
 import { getLastSentDisplayDateTime } from "@/services/ContactService";
 import {
   revalidateIncomingFriendRequestTag,
@@ -20,6 +19,7 @@ import ReceiveFriendRequestNotification from "./ReceiveFriendRequestNotification
 import { ScrollArea } from "../ui/scroll-area";
 import AcceptFriendRequestNotification from "./AcceptFriendRequestNotification";
 import { getAccessToken } from "@/services/AuthService";
+import { SocketContext } from "@/types/context";
 
 const InvitationNotificationList = () => {
   const [mounted, setMounted] = useState<boolean>(false);

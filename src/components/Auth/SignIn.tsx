@@ -246,14 +246,14 @@ const SignIn = () => {
                 Your account has not been activated.
               </p>
               <p className="mb-[6px]">
-                We've sent an email to{" "}
+                We&apos;ve sent an email to{" "}
                 <span className="font-bold">{state.unactivatedEmail}</span>.
                 Please check it to activate your account before logging in.
               </p>
               <div className="flex flex-row">
                 <p className="text-[14px] mr-[5px]">
                   <span className="max-sm:hidden">
-                    Can't find the activation email?{" "}
+                    Can&apos;t find the activation email?{" "}
                   </span>
                   Click here to resend.
                 </p>
