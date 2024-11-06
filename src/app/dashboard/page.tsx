@@ -24,6 +24,7 @@ import {
 } from "@/services/revalidateApiTags";
 import { DashboardTab } from "@/types/ui";
 import { SocketContext } from "@/types/context";
+import { getAccessToken } from "@/services/AuthService";
 
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState<DashboardTab>(
@@ -54,8 +55,12 @@ const DashboardPage = () => {
     async function connectWebSocket(currentUser: User | null) {
       if (!currentUser || ignore) return;
       console.log("Creating STOMP client...");
+      const accessToken = await getAccessToken(true);
       const stompClient = new Client({
         brokerURL: stompClientUrl,
+        connectHeaders: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       stompClient.onConnect = function () {
         // console.log("Successfully connected to STOMP client.");
@@ -109,6 +114,7 @@ const DashboardPage = () => {
         connectWebSocket(data);
       }
     });
+
     return () => {
       ignore = true;
       stompClient?.deactivate();

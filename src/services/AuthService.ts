@@ -282,18 +282,18 @@ export async function logOut(isRedirect: boolean = true) {
   }
 }
 
-export async function getAccessToken(redirectIfFail: boolean = true) {
+export async function getAccessToken(redirectIfFail: boolean = true): Promise<String> {
   const cookieStore = cookies();
   let accessToken = cookieStore.get("access_token");
 
   if (accessToken === undefined) {
-    console.log("No access token *****************")
+    console.log("No access token")
     //use refresh token
     const refreshToken = cookieStore.get("refresh_token");
     if (refreshToken === undefined) {
-    console.log("No refresh token *****************")
+    console.log("No refresh token")
       await logOut(redirectIfFail);
-      return;
+      return "-1";
     }
 
     let response;
@@ -309,7 +309,7 @@ export async function getAccessToken(redirectIfFail: boolean = true) {
     } catch (error) {
       console.log("Error fetching using refresh token: " + error);
       await logOut(redirectIfFail);
-      return;
+      return "-1";
     }
 
     const result = await response.json();
@@ -329,7 +329,7 @@ export async function getAccessToken(redirectIfFail: boolean = true) {
       return result.data.access_token;
     } else {
       await logOut(redirectIfFail);
-      return;
+      return "-1";
     }
   }
 
