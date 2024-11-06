@@ -51,7 +51,6 @@ const DashboardPage = () => {
       return data;
     }
 
-
     async function connectWebSocket(currentUser: User | null) {
       if (!currentUser || ignore) return;
       console.log("Creating STOMP client...");
@@ -115,7 +114,6 @@ const DashboardPage = () => {
       stompClient?.deactivate();
     };
   }, []);
-  
 
   const onPrivateMessage = (payload: any) => {
     const message = JSON.parse(payload.body) as Message;
@@ -161,11 +159,6 @@ const DashboardPage = () => {
 
   return (
     <section className="flex">
-      <SideNavbar
-        currentUser={currentUser}
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-      />
       <SocketContext.Provider
         value={{
           stompClient,
@@ -175,6 +168,11 @@ const DashboardPage = () => {
           setSocketNewInvitationNotifications,
         }}
       >
+        <SideNavbar
+          currentUser={currentUser}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+        />
         <div className="w-full">
           {currentTab === DashboardTab.DIRECT_MESSAGE && (
             <DirectMessage
