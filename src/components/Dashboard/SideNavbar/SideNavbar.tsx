@@ -35,8 +35,9 @@ import {
 import Link from "next/link";
 import { logOut } from "@/services/AuthService";
 import { User } from "@/types/user";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import { DashboardTab } from "@/types/ui";
+import { SocketContext } from "@/types/context";
 
 interface SideNavbarProps {
   currentUser: User;
@@ -46,6 +47,16 @@ interface SideNavbarProps {
 
 const SideNavbar = (props: SideNavbarProps) => {
   const pathname = usePathname();
+  const socketContext = useContext(SocketContext);
+
+  const handleLogOut = async () => {
+    if (!socketContext?.stompClient) {
+      logOut();
+    } else {
+      socketContext.stompClient.deactivate().then(() => logOut());
+    }
+  };
+
   return (
     <nav className="min-w-[64px] min-h-screen bg-dark-10">
       <div className="flex flex-col justify-between h-full">
@@ -84,7 +95,7 @@ const SideNavbar = (props: SideNavbarProps) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => logOut()}
+                    onClick={handleLogOut}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>

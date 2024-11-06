@@ -43,6 +43,7 @@ const MessageBox = (props: MessageBoxProps) => {
             message: text,
             image_url: uploadResult.imageUrl,
           };
+          setImageFile(null)
           setImageUrl(null);
         } else {
           console.error("Image upload failed:", uploadResult.serverErrors);
