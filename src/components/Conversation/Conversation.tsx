@@ -68,6 +68,7 @@ const Conversation = (props: ConversationProps) => {
     }
   }, [props.newConversationMessage]);
 
+
   async function fetchMessages(ignore: boolean, messagePage: number, contactId: string) {
     const res = await fetch(
       `/dashboard/api/message?conversationId=${contactId}&page=${messagePage}`,

@@ -37,6 +37,7 @@ export interface ContactResponse extends GenericResponse {
   };
 }
 
+// Updated interface for conversation messages to include image_url
 export interface ConversationMessageResponse extends GenericResponse {
   data: GenericMetaResponse & {
     result: {
@@ -47,6 +48,7 @@ export interface ConversationMessageResponse extends GenericResponse {
       message_type: MessageType;
       is_reacted: boolean;
       sent_at: number;
+      image_url: string | null; // Optional field for image URL
     }[];
   };
 }
