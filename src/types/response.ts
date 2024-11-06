@@ -1,7 +1,7 @@
 import { Contact } from "./contact";
 import { MessageType } from "./message";
 import { InvitationNotification } from "./notification";
-import { UserStatus } from "./user";
+import { User, UserStatus } from "./user";
 
 export interface GenericResponse {
   error: string[];
@@ -57,4 +57,12 @@ export interface InvitationNotificationResponse extends GenericResponse {
   data: GenericMetaResponse & {
     result: InvitationNotification[];
   };
+}
+
+export interface UserResponse extends GenericResponse {
+  data: {
+    access_token: string,
+    token_type: string,
+    user: User
+  }
 }

@@ -1,39 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from 'react';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import GroupImgComponent from "./GroupImgComponent";
 import { group }  from "@/types/group"
+import GroupAddForm from "./GroupAddForm";
 
 interface GroupListProps {
     groups: group[];
     selectedGroup: group | null;
     onSelectGroup: (selectedgroup: group) => void;
+    onFetchGroups: () => Promise<void>;
   }
 
 const GroupList = (props: GroupListProps) =>{
-    const { groups, selectedGroup, onSelectGroup } = props;
-
+    const { groups, selectedGroup, onSelectGroup,onFetchGroups } = props;
     return (
         
         <ScrollArea className="size-full overflow-visible">
         {
           groups?.map((group) => {
-            return <GroupImgComponent group_id={group.groupid} group_image={group.groupimage} group_owner={group.ownerid} group_name={group.groupname}
+            return <GroupImgComponent key={group.group_id} group_id={group.group_id} group_image={group.group_img} group_owner={group.owner_id} group_name={group.group_name} onGroupUpdated={onFetchGroups}
             // noMissedMessages={0}
             // isLastMessageFromUser={false}
             // lastMessage={""} lastSent={undefined} 
-            className={selectedGroup?.groupid===group.groupid ? "bg-dark-1 rounded-[8px]" : ""}
+            className={selectedGroup?.group_id===group.group_id ? "bg-dark-1 rounded-[8px]" : ""}
             handleClick={() => onSelectGroup(group)}/>
           })
         }
         <ScrollBar className="custom-scrollbar"/>
         <div className="h-[70px] p-[10px]">
-      <button 
-        onClick={() => console.log("Add Group")}
-        className="w-12 h-12 rounded-full bg-blue-500 text-white flex justify-center items-center shadow-lg hover:bg-blue-600">
-        <span className="pointer-events-none select-none" aria-hidden="true">+</span>
-      </button>
+        <GroupAddForm onGroupAdded={onFetchGroups}/>
     </div>
       </ScrollArea>
     )

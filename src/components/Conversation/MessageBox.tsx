@@ -4,8 +4,8 @@ import { ImageIcon, SendHorizontalIcon, StickerIcon, PaperclipIcon, EllipsisIcon
 import { ChangeEvent, useContext, useState, useEffect } from "react";
 import { User } from "@/types/user";
 import Image from 'next/image';
-import { SocketContext } from "@/app/dashboard/page";
 import { uploadImage } from "@/services/MessageService";
+import { SocketContext } from "@/types/context";
 
 interface MessageBoxProps {
   currentUser: User;

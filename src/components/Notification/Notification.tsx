@@ -30,8 +30,9 @@ const Notification = () => {
           <FontAwesomeIcon
             icon={faInbox}
             fontSize={24}
-            className={cn("text-gray-1 hover:text-gray-2 ",
-                isOpened && "text-gray-2 "
+            className={cn(
+              "text-gray-1 hover:text-gray-2 ",
+              isOpened && "text-gray-2 "
             )}
           />
         </PopoverTrigger>
@@ -85,8 +86,10 @@ const Notification = () => {
               Mentions
             </div>
           </div>
-          <ScrollArea className="w-[472px] max-h-[60vh]">
-            {selectedTab === NotifcationTab.FOR_YOU && <InvitationNotificationList />}
+          <ScrollArea className="w-[472px] ">
+            {selectedTab === NotifcationTab.FOR_YOU && (
+              <InvitationNotificationList />
+            )}
           </ScrollArea>
         </PopoverContent>
       </Popover>

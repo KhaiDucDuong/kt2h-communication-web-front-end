@@ -210,5 +210,6 @@ export const conversationMessages = {
 };
 
 export const accessTokenCookieName = "access_token";
+export const oauth2AuthResultCookieName = "oauth2_auth_result";
 export const refreshTokenCookieName = "refresh_token";
 export const userSessionCookieName = "user_session";

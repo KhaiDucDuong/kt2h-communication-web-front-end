@@ -35,8 +35,8 @@ import {
 import Link from "next/link";
 import { logOut } from "@/services/AuthService";
 import { User } from "@/types/user";
-import { DashboardTab } from "@/app/dashboard/page";
 import { Dispatch, SetStateAction } from "react";
+import { DashboardTab } from "@/types/ui";
 
 interface SideNavbarProps {
   currentUser: User;

@@ -8,35 +8,22 @@ import DirectMessage from "@/components/Direct-message/DirectMessage";
 import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
 import { Message, messageSchema } from "@/types/message";
 import Friends from "@/components/Friends/Friends";
-import Groups  from "@/components/Groups/Groups";
+import Groups from "@/components/Groups/Groups";
 import {
   InvitationNotification,
   invitationNotificationSchema,
+  NotificationSocketEvent,
+  SocketInvitationNotification,
+  socketInvitationNotificationSchema,
 } from "@/types/notification";
 import {
+  revalidateAllTags,
   revalidateIncomingFriendRequestTag,
   revalidateInvitationNotificationTag,
+  revalidateOutgoingFriendRequestTag,
 } from "@/services/revalidateApiTags";
-
-export enum DashboardTab {
-  DIRECT_MESSAGE,
-  GROUP_CHAT,
-  SETTINGS,
-  FRIENDS,
-}
-
-type ISocketContext = {
-  stompClient: Client | undefined;
-  newConversationMessage: Message | null;
-  setNewConversationMessage: React.Dispatch<React.SetStateAction<Message | null>>
-  newInvitationNotification: InvitationNotification | null;
-  setNewInvitationNotification: React.Dispatch<
-    React.SetStateAction<InvitationNotification | null>
-  >;
-};
-
-export const SocketContext =
-  createContext<ISocketContext | null>(null);
+import { DashboardTab } from "@/types/ui";
+import { SocketContext } from "@/types/context";
 
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState<DashboardTab>(
@@ -46,8 +33,10 @@ const DashboardPage = () => {
   const [stompClient, setStompClient] = useState<Client>();
   const [newConversationMessage, setNewConversationMessage] =
     useState<Message | null>(null);
-  const [newInvitationNotification, setNewInvitationNotification] =
-    useState<InvitationNotification | null>(null);
+  const [
+    newSocketInvitationNotifications,
+    setSocketNewInvitationNotifications,
+  ] = useState<SocketInvitationNotification[]>([]);
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
 
   useEffect(() => {
@@ -61,6 +50,7 @@ const DashboardPage = () => {
       }
       return data;
     }
+
 
     async function connectWebSocket(currentUser: User | null) {
       if (!currentUser || ignore) return;
@@ -116,13 +106,16 @@ const DashboardPage = () => {
 
     console.log("Fetching current user...");
     fetchCurrentUser().then((data) => {
-      connectWebSocket(data);
+      if (data && !ignore) {
+        connectWebSocket(data);
+      }
     });
     return () => {
       ignore = true;
       stompClient?.deactivate();
     };
   }, []);
+  
 
   const onPrivateMessage = (payload: any) => {
     const message = JSON.parse(payload.body) as Message;
@@ -138,23 +131,32 @@ const DashboardPage = () => {
   };
 
   const onNotification = (payload: any) => {
-    const notification = JSON.parse(payload.body) as InvitationNotification;
+    const notification = JSON.parse(
+      payload.body
+    ) as SocketInvitationNotification;
     console.log("Receive a notification");
     // console.log(JSON.stringify(payload));
     try {
       const validatedNotification =
-        invitationNotificationSchema.parse(notification);
+        socketInvitationNotificationSchema.parse(notification);
     } catch (error) {
       console.log("Invalid notification payload");
       return;
     }
-    setNewInvitationNotification(notification);
+    setSocketNewInvitationNotifications((prev) => [...prev, notification]);
     revalidateInvitationNotificationTag();
-    revalidateIncomingFriendRequestTag();
+    notification.socket_event === NotificationSocketEvent.RECEIVE_FRIEND_REQUEST
+      ? revalidateIncomingFriendRequestTag()
+      : revalidateOutgoingFriendRequestTag();
   };
 
   if (!stompClient || !currentUser) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        Loading...{" "}
+        {"Stomp: " + String(stompClient) + " User: " + String(currentUser)}
+      </div>
+    );
   }
 
   return (
@@ -165,7 +167,13 @@ const DashboardPage = () => {
         setCurrentTab={setCurrentTab}
       />
       <SocketContext.Provider
-        value={{ stompClient, newConversationMessage, setNewConversationMessage, newInvitationNotification, setNewInvitationNotification }}
+        value={{
+          stompClient,
+          newConversationMessage,
+          setNewConversationMessage,
+          newSocketInvitationNotifications,
+          setSocketNewInvitationNotifications,
+        }}
       >
         <div className="w-full">
           {currentTab === DashboardTab.DIRECT_MESSAGE && (
@@ -175,7 +183,9 @@ const DashboardPage = () => {
               setNewConversationMessage={setNewConversationMessage}
             />
           )}
-          {currentTab === DashboardTab.GROUP_CHAT && <Groups />}
+          {currentTab === DashboardTab.GROUP_CHAT && (
+            <Groups currentUser={currentUser} />
+          )}
           {currentTab === DashboardTab.FRIENDS && <Friends />}
           {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
         </div>
