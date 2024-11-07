@@ -1,31 +1,90 @@
 "use client";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ContactMessageHeader from "./ContactMessageHeader";
 import ContactMoreInfoPanel from "./ContactMoreInfoPanel";
 import Conversation from "../Conversation/Conversation";
 import { Client } from "@stomp/stompjs";
-import { User } from "@/types/user";
+import {
+  SocketStatusUpdate,
+  socketStatusUpdateSchema,
+  User,
+  UserStatus,
+} from "@/types/user";
 import { Contact } from "@/types/contact";
 import { Message } from "@/types/message";
+import { SocketContext } from "@/types/context";
 
 interface MessagePanelProps {
-  currentUser: User;
-  contact: Contact | null;
+  contact: Contact;
   newConversationMessage: Message | null;
   setNewConversationMessage: (message: Message | null) => void;
 }
 
 const MessagePanel = (props: MessagePanelProps) => {
   const [isMoreInfoExpanded, setIsMoreInfoExpanded] = useState<boolean>(false);
+  const [conversationPartnerStatus, setConversationPartnerStatus] =
+    useState<UserStatus>(props.contact.to_user_status);
+  const socketContext = useContext(SocketContext);
 
-  if (props.contact === null)
-    return (
-      <section className="size-full bg-dark-4 flex justify-center">
-        <p className="self-center text-gray-2 text-[20px]">
-          No conversation selected
-        </p>
-      </section>
-    );
+  useEffect(() => {
+    let subscribeId: string;
+    if (!socketContext || !socketContext.stompClient?.connected) {
+      console.log(
+        "Socket context is undefined or stomp connection hasn't established"
+      );
+      return;
+    }
+
+    function subscribeToConversationPartner(
+      contact: Contact,
+      stompClient: Client
+    ) {
+      subscribeId = stompClient.subscribe(
+        "/user/" + contact.to_user_id + "/status",
+        onConversationPartnerStatusUpdate
+      ).id;
+      console.log(
+        "Successfully subscribe to " + "/user/" + contact.to_user_id + "/status"
+      );
+    }
+
+    subscribeToConversationPartner(props.contact, socketContext.stompClient);
+
+    return () => {
+      if (!socketContext || !socketContext.stompClient?.connected) return;
+      socketContext?.stompClient?.unsubscribe(subscribeId);
+      console.log(
+        "Successfully unsubscribe to " +
+          "/user/" +
+          props.contact.to_user_id +
+          "/status"
+      );
+    };
+  }, [props.contact]);
+
+  function onConversationPartnerStatusUpdate(payload: any) {
+    const statusUpdate = JSON.parse(payload.body) as SocketStatusUpdate;
+    console.log("Receive a status update");
+    // console.log(JSON.stringify(payload.body));
+    try {
+      const validatedStatusUpdate =
+        socketStatusUpdateSchema.parse(statusUpdate);
+    } catch (error) {
+      console.log("Invalid status update payload");
+      return;
+    }
+
+    if (statusUpdate.user_id === props.contact.to_user_id) {
+      console.log(
+        "Updating conversation partner status " +
+          statusUpdate.status +
+          " " +
+          statusUpdate.last_activity_at
+      );
+      props.contact.to_user_last_activity_at = statusUpdate.last_activity_at;
+      setConversationPartnerStatus(statusUpdate.status);
+    }
+  }
 
   return (
     <section className="flex flex-row size-full bg-dark-4">
@@ -33,6 +92,7 @@ const MessagePanel = (props: MessagePanelProps) => {
         <div className="h-[98px]">
           <ContactMessageHeader
             contact={props.contact}
+            contactStatus={conversationPartnerStatus}
             profileHandleClick={() => {}}
             phoneHandleClick={() => {}}
             cameraHandleClick={() => {}}
@@ -46,7 +106,6 @@ const MessagePanel = (props: MessagePanelProps) => {
         <div className="pt-[2px] size-full max-h-[calc(100vh-98px)]">
           <Conversation
             contact={props.contact}
-            currentUser={props.currentUser}
             newConversationMessage={props.newConversationMessage}
             setNewConversationMessage={props.setNewConversationMessage}
           />

@@ -7,6 +7,7 @@ import {
   registerSchema,
 } from "@/types/auth";
 import { UserResponse } from "@/types/response";
+import { User } from "@/types/user";
 import {
   accessTokenCookieName,
   oauth2AuthResultCookieName,
@@ -149,12 +150,13 @@ export async function signIn(
     const setCookies = response.headers.getSetCookie();
     const refreshTokenExpiration = 90 * 24 * 60 * 60 * 1000; //90 days
     setCookies.forEach((cookie) => {
-      if(!cookie.match("refresh_token=")) return;
+      if (!cookie.match("refresh_token=")) return;
       const refreshTokenValue = cookie.split("refresh_token=")[1];
+      const userSessionData: User = result.data.user;
       setAuthCookies(
         result.data.access_token,
         refreshTokenValue,
-        JSON.stringify(result.data.user)
+        userSessionData
       );
     });
 
@@ -282,16 +284,18 @@ export async function logOut(isRedirect: boolean = true) {
   }
 }
 
-export async function getAccessToken(redirectIfFail: boolean = true): Promise<String> {
+export async function getAccessToken(
+  redirectIfFail: boolean = true
+): Promise<String> {
   const cookieStore = cookies();
   let accessToken = cookieStore.get("access_token");
 
   if (accessToken === undefined) {
-    console.log("No access token")
+    console.log("No access token");
     //use refresh token
     const refreshToken = cookieStore.get("refresh_token");
     if (refreshToken === undefined) {
-    console.log("No refresh token")
+      console.log("No refresh token");
       await logOut(redirectIfFail);
       return "-1";
     }
@@ -318,12 +322,13 @@ export async function getAccessToken(redirectIfFail: boolean = true): Promise<St
       //get refresh token from response cookies and set it to next server cookie
       const setCookies = response.headers.getSetCookie();
       setCookies.forEach((cookie) => {
-        if(!cookie.match("refresh_token=")) return;
+        if (!cookie.match("refresh_token=")) return;
         const refreshTokenValue = cookie.split("refresh_token=")[1];
+        const userSessionData: User = result.data.user;
         setAuthCookies(
           result.data.access_token,
           refreshTokenValue,
-          JSON.stringify(result.data.user)
+          userSessionData
         );
       });
       return result.data.access_token;
@@ -406,12 +411,13 @@ export async function oauth2AccountRegister(
     //get refresh token from response cookies and set it to next server cookie
     const setCookies = response.headers.getSetCookie();
     setCookies.forEach((cookie) => {
-      if(!cookie.match("refresh_token=")) return;
+      if (!cookie.match("refresh_token=")) return;
       const refreshTokenValue = cookie.split("refresh_token=")[1];
+      const userSessionData: User = result.data.user;
       setAuthCookies(
         result.data.access_token,
         refreshTokenValue,
-        JSON.stringify(result.data.user)
+        userSessionData
       );
     });
     deleteAuthResultCookie();
@@ -432,14 +438,17 @@ export async function getCurrentUserAndRefreshToken(): Promise<GetCurrentUserAnd
 
   let response;
   try {
-    response = await fetch(`${process.env.GET_CURRENT_USER_AND_REFRESH_TOKEN}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      cache: "no-cache",
-    });
+    response = await fetch(
+      `${process.env.GET_CURRENT_USER_AND_REFRESH_TOKEN}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: "no-cache",
+      }
+    );
   } catch (error) {
     console.log("Error calling getting user api: " + error);
     return {
@@ -455,12 +464,12 @@ export async function getCurrentUserAndRefreshToken(): Promise<GetCurrentUserAnd
     //get refresh token from response cookies and set it to next server cookie
     const setCookies = response.headers.getSetCookie();
     setCookies.forEach((cookie) => {
-      if(!cookie.match("refresh_token=")) return;
+      if (!cookie.match("refresh_token=")) return;
       const refreshTokenValue = cookie.split("refresh_token=")[1];
       setAuthCookies(
         result.data.access_token,
         refreshTokenValue,
-        JSON.stringify(result.data.user)
+        result.data.user
       );
     });
 
@@ -476,7 +485,7 @@ export async function getCurrentUserAndRefreshToken(): Promise<GetCurrentUserAnd
 async function setAuthCookies(
   accessToken: string,
   refreshToken: string,
-  user: any
+  user: User
 ) {
   const cookieStore = cookies();
   const refreshTokenExpiration = 90 * 24 * 60 * 60 * 1000; //90 days
@@ -493,7 +502,7 @@ async function setAuthCookies(
 
   cookieStore.set({
     name: userSessionCookieName,
-    value: user,
+    value: JSON.stringify(user),
     httpOnly: true,
     sameSite: "strict",
     secure: true,
@@ -510,6 +519,17 @@ export async function setAccessTokenCookie(accessToken: string) {
     sameSite: "strict",
     secure: true,
     expires: Date.now() + accessTokenExpiration,
+  });
+}
+
+export async function setUserSessionCookie(user: User) {
+  const cookieStore = cookies();
+  cookieStore.set({
+    name: userSessionCookieName,
+    value: JSON.stringify(user),
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
   });
 }
 

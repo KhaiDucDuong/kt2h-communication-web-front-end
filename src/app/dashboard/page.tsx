@@ -1,8 +1,13 @@
 "use client";
 
 import { Client } from "@stomp/stompjs";
-import { createContext, useEffect, useState } from "react";
-import { User } from "@/types/user";
+import { createContext, useEffect, useRef, useState } from "react";
+import {
+  SocketStatusUpdate,
+  socketStatusUpdateSchema,
+  User,
+  UserStatus,
+} from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
 import DirectMessage from "@/components/Direct-message/DirectMessage";
 import SideNavbar from "@/components/Dashboard/SideNavbar/SideNavbar";
@@ -23,8 +28,19 @@ import {
   revalidateOutgoingFriendRequestTag,
 } from "@/services/revalidateApiTags";
 import { DashboardTab } from "@/types/ui";
-import { SocketContext } from "@/types/context";
-import { getAccessToken } from "@/services/AuthService";
+import { SocketContext, UserSessionContext } from "@/types/context";
+import { getAccessToken, setUserSessionCookie } from "@/services/AuthService";
+
+const IDLE_INTERVAL_TIME = 1000 * 60 * 5; // 1000 * 60 * 5 = 300,000 ms = 5 minutes
+const events = [
+  // "mousedown",
+  "mousemove",
+  // "wheel",
+  "keydown",
+  // "touchstart",
+  // "scroll",
+  // ... add other events here ...
+];
 
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState<DashboardTab>(
@@ -39,6 +55,10 @@ const DashboardPage = () => {
     setSocketNewInvitationNotifications,
   ] = useState<SocketInvitationNotification[]>([]);
   const stompClientUrl = process.env.NEXT_PUBLIC_URL_STOMP_CLIENT;
+  const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const userRef = useRef<User | undefined>(currentUser);
+  const stompClientRef = useRef<Client | undefined>(stompClient);
+  const wasActiveRef = useRef<boolean>(true);
 
   useEffect(() => {
     let ignore = false;
@@ -48,6 +68,8 @@ const DashboardPage = () => {
       if (data && !ignore) {
         console.log("Set current user data");
         setCurrentUser(data);
+        userRef.current = data;
+        wasActiveRef.current = (data.status === UserStatus.ONLINE);
       }
       return data;
     }
@@ -58,6 +80,9 @@ const DashboardPage = () => {
       const accessToken = await getAccessToken(true);
       const stompClient = new Client({
         brokerURL: stompClientUrl,
+        heartbeatIncoming: 10000, // Expect a heartbeat every 10 seconds from the server
+        heartbeatOutgoing: 10000, // Send a heartbeat every 10 seconds to the server
+        reconnectDelay: 5000, // Reconnect after 5 seconds if disconnected
         connectHeaders: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -84,7 +109,19 @@ const DashboardPage = () => {
             currentUser.user_id +
             "/notification"
         );
+
+        stompClient.subscribe(
+          "/user/" + currentUser.user_id + "/status",
+          onStatusUpdate
+        );
+        console.log(
+          "Successfully subscribe to " +
+            "/user/" +
+            currentUser.user_id +
+            "/status"
+        );
         setStompClient(stompClient);
+        stompClientRef.current = stompClient;
       };
 
       stompClient.onStompError = function (frame) {
@@ -98,28 +135,82 @@ const DashboardPage = () => {
 
       stompClient.onDisconnect = function () {
         console.log("Disconnected from STOMP client.");
-        stompClient?.unsubscribe("/user/" + currentUser?.user_id + "/private");
-        console.log(
-          "Unsubscribed from /user/" + currentUser?.user_id + "/private"
-        );
+        // stompClient?.unsubscribe("/user/" + currentUser?.user_id + "/private");
+        // console.log(
+        //   "Unsubscribed from /user/" + currentUser?.user_id + "/private"
+        // );
         setStompClient(undefined);
       };
 
       stompClient.activate();
     }
 
+    function setupInactivityTimeout() {
+      // inactivityTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>
+      if (inactivityTimeoutRef.current)
+        clearTimeout(inactivityTimeoutRef.current);
+
+      // Set user to "away" after 5 minutes of inactivity
+      inactivityTimeoutRef.current = setTimeout(() => {
+        if (
+          stompClientRef.current?.connected &&
+          userRef.current?.status !== UserStatus.IDLE &&
+          wasActiveRef.current
+        ) {
+          stompClientRef.current.publish({
+            destination: "/app/user/status",
+            body: JSON.stringify({ status: UserStatus.IDLE }),
+          });
+          wasActiveRef.current = false;
+          console.log("Switch to Idle status!!!");
+        }
+      }, IDLE_INTERVAL_TIME);
+    }
+
+    function handleUserActivity() {
+      if (
+        stompClientRef.current?.connected &&
+        userRef.current?.status === UserStatus.IDLE &&
+        !wasActiveRef.current
+      ) {
+        stompClientRef.current.publish({
+          destination: "/app/user/status",
+          body: JSON.stringify({ status: UserStatus.ONLINE }),
+        });
+        wasActiveRef.current = true;
+        console.log("Switch to Online status!!!");
+      }
+      setupInactivityTimeout();
+    }
+
+    const handleUserActivityTimeout = () => handleUserActivity();
     console.log("Fetching current user...");
     fetchCurrentUser().then((data) => {
       if (data && !ignore) {
-        connectWebSocket(data);
+        connectWebSocket(data).then(() => {
+          events.forEach((event) => {
+            document.addEventListener(event, handleUserActivityTimeout);
+          });
+        });
       }
     });
 
     return () => {
       ignore = true;
       stompClient?.deactivate();
+      events.forEach((event) => {
+        document.removeEventListener(event, handleUserActivityTimeout);
+      });
+      if (inactivityTimeoutRef.current)
+        clearTimeout(inactivityTimeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    setCurrentUser(userRef.current);
+
+    return () => {};
+  }, [userRef.current]);
 
   const onPrivateMessage = (payload: any) => {
     const message = JSON.parse(payload.body) as Message;
@@ -154,6 +245,26 @@ const DashboardPage = () => {
       : revalidateOutgoingFriendRequestTag();
   };
 
+  const onStatusUpdate = async (payload: any) => {
+    const statusUpdate = JSON.parse(payload.body) as SocketStatusUpdate;
+    console.log("Receive a status update");
+    // console.log(JSON.stringify(payload.body));
+    try {
+      const validatedStatusUpdate =
+        socketStatusUpdateSchema.parse(statusUpdate);
+    } catch (error) {
+      console.log("Invalid status update payload");
+      return;
+    }
+
+    if (statusUpdate.user_id === userRef.current?.user_id) {
+      console.log("Updating user session data");
+      userRef.current.status = statusUpdate.status;
+      setUserSessionCookie(userRef.current);
+      console.log(userRef.current);
+    }
+  };
+
   if (!stompClient || !currentUser) {
     return (
       <div>
@@ -174,25 +285,26 @@ const DashboardPage = () => {
           setSocketNewInvitationNotifications,
         }}
       >
-        <SideNavbar
-          currentUser={currentUser}
-          currentTab={currentTab}
-          setCurrentTab={setCurrentTab}
-        />
-        <div className="w-full">
-          {currentTab === DashboardTab.DIRECT_MESSAGE && (
-            <DirectMessage
-              currentUser={currentUser}
-              newConversationMessage={newConversationMessage}
-              setNewConversationMessage={setNewConversationMessage}
-            />
-          )}
-          {currentTab === DashboardTab.GROUP_CHAT && (
-            <Groups currentUser={currentUser} />
-          )}
-          {currentTab === DashboardTab.FRIENDS && <Friends />}
-          {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
-        </div>
+        <UserSessionContext.Provider
+          value={{
+            currentUser,
+          }}
+        >
+          <SideNavbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
+          <div className="w-full">
+            {currentTab === DashboardTab.DIRECT_MESSAGE && (
+              <DirectMessage
+                newConversationMessage={newConversationMessage}
+                setNewConversationMessage={setNewConversationMessage}
+              />
+            )}
+            {currentTab === DashboardTab.GROUP_CHAT && (
+              <Groups currentUser={currentUser} />
+            )}
+            {currentTab === DashboardTab.FRIENDS && <Friends />}
+            {currentTab === DashboardTab.SETTINGS && <div>settings</div>}
+          </div>
+        </UserSessionContext.Provider>
       </SocketContext.Provider>
     </section>
   );

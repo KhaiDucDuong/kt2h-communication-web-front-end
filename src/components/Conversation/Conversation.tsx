@@ -1,10 +1,8 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
-import { conversationMessages } from "@/utils/constants";
 import ConversationMessage from "../Direct-message/ConversationMessage";
 import MessageBox from "./MessageBox";
-import { Client } from "@stomp/stompjs";
-import { User } from "@/types/user";
+import { UserStatus } from "@/types/user";
 import { Contact } from "@/types/contact";
 import { ConversationMessageResponse } from "@/types/response";
 import {
@@ -13,9 +11,9 @@ import {
   Message,
   MessageGroup,
 } from "@/types/message";
+import { UserSessionContext } from "@/types/context";
 
 interface ConversationProps {
-  currentUser: User;
   contact: Contact;
   newConversationMessage: Message | null;
   setNewConversationMessage: (message: Message | null) => void;
@@ -26,14 +24,20 @@ const Conversation = (props: ConversationProps) => {
   const [messageGroups, setMessageGroups] = useState<MessageGroup[]>([]);
   const [messagePage, setMessagePage] = useState<number>(1);
   const [hasMoreMessages, setHasMoreMessages] = useState<boolean>(true);
+  const userSessionContext = useContext(UserSessionContext);
 
   useEffect(() => {
     let ignore = false;
 
     fetchMessages(ignore, 1, props.contact.id);
 
+
     return () => {
       ignore = true;
+      setMessages([])
+      setMessageGroups([])
+      setMessagePage(1);
+      setHasMoreMessages(true);
     };
   }, [props.contact.id]);
 
@@ -68,7 +72,6 @@ const Conversation = (props: ConversationProps) => {
     }
   }, [props.newConversationMessage]);
 
-
   async function fetchMessages(ignore: boolean, messagePage: number, contactId: string) {
     const res = await fetch(
       `/dashboard/api/message?conversationId=${contactId}&page=${messagePage}`,
@@ -91,11 +94,7 @@ const Conversation = (props: ConversationProps) => {
     }
   }
 
-  // useEffect(() => {
-  //   if (lastMessageRef.current !== null) {
-  //     lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [lastMessageRef]);
+  if(!userSessionContext || !userSessionContext.currentUser) return <div>User context is null or current user is undefined</div>
 
   return (
     <section className="size-full flex flex-col">
@@ -114,11 +113,11 @@ const Conversation = (props: ConversationProps) => {
                   }
                   messages={messageGroup.messages}
                   senderName={
-                    messageGroup.sender_id === props.currentUser.user_id
+                    messageGroup.sender_id === userSessionContext!.currentUser!.user_id
                       ? props.contact.requester_nickname
                       : props.contact.to_user_nickname
                   }
-                  senderImage={messageGroup.sender_id === props.currentUser.user_id ? props.currentUser.image : props.contact.to_user_image}
+                  senderImage={messageGroup.sender_id === userSessionContext!.currentUser!.user_id ? userSessionContext!.currentUser!.image : props.contact.to_user_image}
                   isLastMessage={true}
                 />
               </div>
@@ -129,15 +128,15 @@ const Conversation = (props: ConversationProps) => {
                 <ConversationMessage
                   sentDateTime={messageGroup.sentDateTime}
                   fromUser={
-                    messageGroup.sender_id === props.currentUser.user_id
+                    messageGroup.sender_id === userSessionContext!.currentUser!.user_id
                   }
                   messages={messageGroup.messages}
                   senderName={
-                    messageGroup.sender_id === props.currentUser.user_id
+                    messageGroup.sender_id === userSessionContext!.currentUser!.user_id
                       ? props.contact.requester_nickname
                       : props.contact.to_user_nickname
                   }
-                  senderImage={messageGroup.sender_id === props.currentUser.user_id ? props.currentUser.image : props.contact.to_user_image}
+                  senderImage={messageGroup.sender_id === userSessionContext!.currentUser!.user_id ? userSessionContext!.currentUser!.image : props.contact.to_user_image}
                   isLastMessage={false}
                 />
               </div>
@@ -146,7 +145,7 @@ const Conversation = (props: ConversationProps) => {
         })}
       </ScrollArea>
       <MessageBox
-        currentUser={props.currentUser}
+        currentUser={userSessionContext.currentUser}
         contactId={props.contact.id}
       />
     </section>

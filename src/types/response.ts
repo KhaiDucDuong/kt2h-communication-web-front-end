@@ -32,6 +32,7 @@ export interface ContactResponse extends GenericResponse {
         to_user_last_name: string;
         to_user_email: string;
         to_user_status: UserStatus;
+        to_user_last_activity_at: number;
       };
     }[];
   };

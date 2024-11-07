@@ -37,10 +37,9 @@ import { logOut } from "@/services/AuthService";
 import { User } from "@/types/user";
 import { Dispatch, SetStateAction, useContext } from "react";
 import { DashboardTab } from "@/types/ui";
-import { SocketContext } from "@/types/context";
+import { SocketContext, UserSessionContext } from "@/types/context";
 
 interface SideNavbarProps {
-  currentUser: User;
   currentTab: DashboardTab;
   setCurrentTab: Dispatch<SetStateAction<DashboardTab>>;
 }
@@ -48,6 +47,7 @@ interface SideNavbarProps {
 const SideNavbar = (props: SideNavbarProps) => {
   const pathname = usePathname();
   const socketContext = useContext(SocketContext);
+  const userSessionContext = useContext(UserSessionContext);
 
   const handleLogOut = async () => {
     if (!socketContext?.stompClient) {
@@ -56,6 +56,8 @@ const SideNavbar = (props: SideNavbarProps) => {
       socketContext.stompClient.deactivate().then(() => logOut());
     }
   };
+
+  if(!userSessionContext || !userSessionContext.currentUser) return <div>User context is null or current user is undefined</div>
 
   return (
     <nav className="min-w-[64px] min-h-screen bg-dark-10">
@@ -68,13 +70,13 @@ const SideNavbar = (props: SideNavbarProps) => {
                   <Image
                     className="rounded-full m-auto hover:cursor-pointer"
                     src={
-                      props.currentUser.image === null
+                      userSessionContext.currentUser.image === null
                         ? "/assets/images/profile-pic.jpg"
-                        : props.currentUser.image
+                        : userSessionContext.currentUser.image
                     }
                     width={48}
                     height={48}
-                    alt={props.currentUser.first_name + "'s profile picture"}
+                    alt={userSessionContext.currentUser.first_name + "'s profile picture"}
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -109,18 +111,18 @@ const SideNavbar = (props: SideNavbarProps) => {
                     <Image
                       className="rounded-full "
                       src={
-                        props.currentUser.image === null
+                        userSessionContext.currentUser.image === null
                           ? "/assets/images/profile-pic.jpg"
-                          : props.currentUser.image
+                          : userSessionContext.currentUser.image
                       }
-                      alt={props.currentUser.first_name + "'s profile picture"}
+                      alt={userSessionContext.currentUser.first_name + "'s profile picture"}
                       width={70}
                       height={70}
                     />
                     <p className="font-semibold">
-                      {props.currentUser.last_name +
+                      {userSessionContext.currentUser.last_name +
                         " " +
-                        props.currentUser.first_name}
+                        userSessionContext.currentUser.first_name}
                     </p>
                   </div>
                 </DialogHeader>
@@ -130,7 +132,7 @@ const SideNavbar = (props: SideNavbarProps) => {
                       Email:
                     </span>
                     <span className="flex-1 text-gray-4">
-                      {props.currentUser.email}
+                      {userSessionContext.currentUser.email}
                     </span>
                   </DialogDescription>
                   <DialogDescription className="flex items-center space-x-4">
@@ -138,7 +140,7 @@ const SideNavbar = (props: SideNavbarProps) => {
                       Phone:
                     </span>
                     <span className="flex-1 text-gray-4">
-                      {props.currentUser.phone || ""}
+                      {userSessionContext.currentUser.phone || ""}
                     </span>
                   </DialogDescription>
                   <DialogDescription className="flex items-center space-x-4">

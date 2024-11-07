@@ -36,6 +36,7 @@ export interface Contact {
   to_user_first_name: string;
   to_user_last_name: string;
   to_user_status: UserStatus;
+  to_user_last_activity_at: number;
   // messages: Message[];
   // last_message: Message;
 }
@@ -50,6 +51,7 @@ export const contactSchema: z.ZodType<Contact> = z.object({
   to_user_first_name: z.string(),
   to_user_last_name: z.string(),
   to_user_status: z.nativeEnum(UserStatus),
+  to_user_last_activity_at: z.number()
 });
 
 export function getContactsFromResponse(
@@ -67,7 +69,7 @@ export function getContactsFromResponse(
     contact.to_user_first_name = contactResponse.toUser.to_user_first_name;
     contact.to_user_last_name = contactResponse.toUser.to_user_last_name;
     contact.to_user_status = contactResponse.toUser.to_user_status;
-
+    contact.to_user_last_activity_at = contactResponse.toUser.to_user_last_activity_at;
     try {
       const validatedContact = contactSchema.parse(contact);
     } catch (e) {
