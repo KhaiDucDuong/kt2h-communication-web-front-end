@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "KT2H",
   description: "Communication app made by KT2H from HCMUTE university",
+  icons: "/favico.ico"
 };
 
 export default function RootLayout({
