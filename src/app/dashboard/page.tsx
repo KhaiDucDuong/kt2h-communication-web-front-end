@@ -31,7 +31,7 @@ import { DashboardTab } from "@/types/ui";
 import { SocketContext, UserSessionContext } from "@/types/context";
 import { getAccessToken, setUserSessionCookie } from "@/services/AuthService";
 
-const IDLE_INTERVAL_TIME = 1000 * 10; // 1000 * 60 * 5 = 300,000 ms = 5 minutes
+const IDLE_INTERVAL_TIME = 1000 * 60 * 5; // 1000 * 60 * 5 = 300,000 ms = 5 minutes
 const events = [
   // "mousedown",
   "mousemove",
@@ -224,7 +224,7 @@ const DashboardPage = () => {
     }
     setNewConversationMessage(message);
   };
-  
+
   const onNotification = (payload: any) => {
     const notification = JSON.parse(
       payload.body
