@@ -34,10 +34,12 @@ export interface User {
 export interface SocketStatusUpdate {
   user_id: string;
   status: UserStatus;
+  last_activity_at: number;
 }
 
 export const socketStatusUpdateSchema: z.ZodType<SocketStatusUpdate> =
   z.object({
     user_id: z.string().uuid(),
     status: z.nativeEnum(UserStatus),
+    last_activity_at: z.number(),
   });

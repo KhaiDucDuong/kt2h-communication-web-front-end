@@ -8,6 +8,7 @@ import { ContactResponse } from "@/types/response";
 import { User } from "@/types/user";
 import { Client } from "@stomp/stompjs";
 import { useEffect, useState } from "react";
+import NoContactMessagePanel from "./NoContactMessagePanel";
 
 interface DirectMessageProps {
   newConversationMessage: Message | null;
@@ -44,10 +45,10 @@ const DirectMessage = (props: DirectMessageProps) => {
     fetchContacts();
 
     return () => {
-      ignore = true;  
-    }
+      ignore = true;
+    };
   }, []);
-  
+
   return (
     <section className="flex flex-row size-full">
       <ContactListPanel
@@ -55,11 +56,15 @@ const DirectMessage = (props: DirectMessageProps) => {
         selectedContact={selectedContact}
         onSelectContact={setSelectedContact}
       />
-      <MessagePanel
-        contact={selectedContact}
-        newConversationMessage={props.newConversationMessage}
-        setNewConversationMessage={props.setNewConversationMessage}
-      />
+      {selectedContact ? (
+        <MessagePanel
+          contact={selectedContact}
+          newConversationMessage={props.newConversationMessage}
+          setNewConversationMessage={props.setNewConversationMessage}
+        />
+      ) : (
+        <NoContactMessagePanel />
+      )}
     </section>
   );
 };

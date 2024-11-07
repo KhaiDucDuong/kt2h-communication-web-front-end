@@ -224,7 +224,7 @@ const DashboardPage = () => {
     }
     setNewConversationMessage(message);
   };
-
+  
   const onNotification = (payload: any) => {
     const notification = JSON.parse(
       payload.body

@@ -1,10 +1,8 @@
-import { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
-import { conversationMessages } from "@/utils/constants";
 import ConversationMessage from "../Direct-message/ConversationMessage";
 import MessageBox from "./MessageBox";
-import { Client } from "@stomp/stompjs";
-import { User } from "@/types/user";
+import { UserStatus } from "@/types/user";
 import { Contact } from "@/types/contact";
 import { ConversationMessageResponse } from "@/types/response";
 import {
@@ -28,14 +26,18 @@ const Conversation = (props: ConversationProps) => {
   const [hasMoreMessages, setHasMoreMessages] = useState<boolean>(true);
   const userSessionContext = useContext(UserSessionContext);
 
-
   useEffect(() => {
     let ignore = false;
 
     fetchMessages(ignore, 1, props.contact.id);
 
+
     return () => {
       ignore = true;
+      setMessages([])
+      setMessageGroups([])
+      setMessagePage(1);
+      setHasMoreMessages(true);
     };
   }, [props.contact.id]);
 
