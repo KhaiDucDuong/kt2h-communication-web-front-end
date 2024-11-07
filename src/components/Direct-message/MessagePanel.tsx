@@ -9,7 +9,6 @@ import { Contact } from "@/types/contact";
 import { Message } from "@/types/message";
 
 interface MessagePanelProps {
-  currentUser: User;
   contact: Contact | null;
   newConversationMessage: Message | null;
   setNewConversationMessage: (message: Message | null) => void;
@@ -46,7 +45,6 @@ const MessagePanel = (props: MessagePanelProps) => {
         <div className="pt-[2px] size-full max-h-[calc(100vh-98px)]">
           <Conversation
             contact={props.contact}
-            currentUser={props.currentUser}
             newConversationMessage={props.newConversationMessage}
             setNewConversationMessage={props.setNewConversationMessage}
           />
