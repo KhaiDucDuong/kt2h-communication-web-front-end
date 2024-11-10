@@ -5,8 +5,8 @@ import ContactMoreInfoPanel from "./ContactMoreInfoPanel";
 import Conversation from "../Conversation/Conversation";
 import { Client } from "@stomp/stompjs";
 import {
-  SocketStatusUpdate,
-  socketStatusUpdateSchema,
+  StatusUpdate,
+  statusUpdateSchema,
   User,
   UserStatus,
 } from "@/types/user";
@@ -65,12 +65,12 @@ const MessagePanel = (props: MessagePanelProps) => {
   }, [props.contact]);
 
   function onConversationPartnerStatusUpdate(payload: any) {
-    const statusUpdate = JSON.parse(payload.body) as SocketStatusUpdate;
+    const statusUpdate = JSON.parse(payload.body) as StatusUpdate;
     console.log("Receive a status update");
     // console.log(JSON.stringify(payload.body));
     try {
       const validatedStatusUpdate =
-        socketStatusUpdateSchema.parse(statusUpdate);
+      statusUpdateSchema.parse(statusUpdate);
     } catch (error) {
       console.log("Invalid status update payload");
       return;
@@ -83,7 +83,6 @@ const MessagePanel = (props: MessagePanelProps) => {
           " " +
           statusUpdate.last_activity_at
       );
-      props.contact.to_user_last_activity_at = statusUpdate.last_activity_at;
       setConversationPartnerStatus(statusUpdate.status);
     }
   }

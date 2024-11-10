@@ -3,8 +3,8 @@
 import { Client } from "@stomp/stompjs";
 import { createContext, useEffect, useRef, useState } from "react";
 import {
-  SocketStatusUpdate,
-  socketStatusUpdateSchema,
+  StatusUpdate,
+  statusUpdateSchema,
   User,
   UserStatus,
 } from "@/types/user";
@@ -69,7 +69,7 @@ const DashboardPage = () => {
         console.log("Set current user data");
         setCurrentUser(data);
         userRef.current = data;
-        wasActiveRef.current = (data.status === UserStatus.ONLINE);
+        wasActiveRef.current = data.status === UserStatus.ONLINE;
       }
       return data;
     }
@@ -246,12 +246,11 @@ const DashboardPage = () => {
   };
 
   const onStatusUpdate = async (payload: any) => {
-    const statusUpdate = JSON.parse(payload.body) as SocketStatusUpdate;
+    const statusUpdate = JSON.parse(payload.body) as StatusUpdate;
     console.log("Receive a status update");
     // console.log(JSON.stringify(payload.body));
     try {
-      const validatedStatusUpdate =
-        socketStatusUpdateSchema.parse(statusUpdate);
+      const validatedStatusUpdate = statusUpdateSchema.parse(statusUpdate);
     } catch (error) {
       console.log("Invalid status update payload");
       return;
