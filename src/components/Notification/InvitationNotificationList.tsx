@@ -20,6 +20,8 @@ import { ScrollArea } from "../ui/scroll-area";
 import AcceptFriendRequestNotification from "./AcceptFriendRequestNotification";
 import { getAccessToken } from "@/services/AuthService";
 import { SocketContext } from "@/types/context";
+import { Skeleton } from "../ui/skeleton";
+import NotificationSkeleton from "./NotificationSkeleton";
 
 const InvitationNotificationList = () => {
   const [mounted, setMounted] = useState<boolean>(false);
@@ -140,7 +142,10 @@ const InvitationNotificationList = () => {
 
   if (isFetching)
     return (
-      <div className="py-[12px] pl-[16px] pr-[8px] text-gray-2">Loading...</div>
+      <section className="max-h-[65vh]">
+        <NotificationSkeleton />
+        <NotificationSkeleton />
+      </section>
     );
 
   return (
@@ -156,14 +161,20 @@ const InvitationNotificationList = () => {
           InvitationNotificationType.FRIEND_REQUEST_RECEIVED
         )
           return (
-            <ReceiveFriendRequestNotification key={notification.id} notification={notification} />
+            <ReceiveFriendRequestNotification
+              key={notification.id}
+              notification={notification}
+            />
           );
         else if (
           notification.type ===
           InvitationNotificationType.FRIEND_REQUEST_ACCEPTED
         ) {
           return (
-            <AcceptFriendRequestNotification key={notification.id} notification={notification} />
+            <AcceptFriendRequestNotification
+              key={notification.id}
+              notification={notification}
+            />
           );
         }
       })}
