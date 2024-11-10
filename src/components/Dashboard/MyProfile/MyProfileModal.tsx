@@ -12,7 +12,14 @@ import { Button } from "@/components/ui/button";
 import { UserIcon, Settings, LogOut, UserRoundPen } from "lucide-react";
 import { UserSessionContext } from "@/types/context";
 import Image from "next/image";
-import { useContext, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
 import { UserStatus } from "@/types/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,6 +29,7 @@ import {
   FILE_SIZE_TOO_LARGE_5MB,
   INVALID_IMG_FILE_TYPE,
 } from "@/types/const/ErrorMessage";
+import { ShowMyAccountModalType } from "../SideNavbar/MyAccountModal";
 
 const ACCEPTED_FILE_TYPE = [
   "image/jpeg",
@@ -30,10 +38,16 @@ const ACCEPTED_FILE_TYPE = [
   "image/gif",
 ];
 
+interface MyProfileModalProps {
+  show: boolean;
+  setShow: Dispatch<SetStateAction<ShowMyAccountModalType>>;
+}
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; //5mbs
 export const PROFILE_IMG_INPUT_ID = "uploaded_profile_img";
 
-const MyProfileModal = () => {
+const MyProfileModal = (props: MyProfileModalProps) => {
+  const { show, setShow } = props;
   const userSessionContext = useContext(UserSessionContext);
   const fileInputId = "uploaded_profile_img";
   const [imgFile, setImgFile] = useState<File>();
@@ -44,16 +58,31 @@ const MyProfileModal = () => {
   const [isEditingImg, setIsEditingImg] = useState<boolean>(false);
   const [croppedImgUrl, setCroppedImgUrl] = useState<string>("");
 
+  function onModalClose(open: boolean) {
+    if (open) return;
+    setImgFile(undefined);
+    setImgPath("");
+    setImgType("");
+    setCroppedImg(null);
+    setSelectedFileError("");
+    setIsEditingImg(false);
+    setCroppedImgUrl("");
+    setShow(ShowMyAccountModalType.NONE);
+  }
+
   if (!userSessionContext || !userSessionContext.currentUser)
     return <div>User context is null or current user is undefined</div>;
 
   return (
-    <section>
-      <DialogContent className="bg-dark-9 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0 px-0">
-        <DialogHeader className="flex flex-col space-y-8 mx-[24px]">
-          <DialogTitle>
-            User profile
-          </DialogTitle>
+    <Dialog open={show} onOpenChange={onModalClose}>
+      <DialogContent
+        className="bg-dark-9 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0 px-0"
+        onInteractOutside={(e) => {
+          if (croppedImgUrl.length > 0) e.preventDefault();
+        }}
+      >
+        <DialogHeader className="flex flex-col space-y-8 mx-[24px] !text-left">
+          <DialogTitle>User profile</DialogTitle>
           <div className="flex items-center space-x-10 mt-4">
             <div className="w-[80px] h-[80px] relative">
               <div
@@ -101,8 +130,6 @@ const MyProfileModal = () => {
                 <Image
                   className="rounded-full transition group-hover:opacity-50"
                   src={
-                    // croppedImgUrl.current
-                    //   ? croppedImgUrl.current
                     croppedImgUrl.length > 0
                       ? croppedImgUrl
                       : userSessionContext.currentUser.image === null
@@ -120,7 +147,7 @@ const MyProfileModal = () => {
               <div className="size-[24px] absolute top-[56px] left-[56px] bg-dark-9 rounded-full">
                 <div
                   className={cn(
-                    "rounded-full size-[16px] bg-yellow-300 absolute top-[4px] left-[4px] ",
+                    "rounded-full size-[16px] bg-red-600 absolute top-[4px] left-[4px] ",
                     userSessionContext.currentUser.status ===
                       UserStatus.ONLINE && "bg-green-600",
                     userSessionContext.currentUser.status === UserStatus.IDLE &&
@@ -165,14 +192,43 @@ const MyProfileModal = () => {
           </DialogDescription>
           <DialogFooter>
             <Dialog>
-              <DialogTrigger asChild className="outline-none">
-                <Button
-                  variant="ghost"
-                  className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
+              <section className="w-full flex flex-col">
+                <DialogTrigger
+                  asChild
+                  className="outline-none w-fit px-[12px] py-[2px] self-end"
                 >
-                  <UserRoundPen className="mr-2" /> Change
-                </Button>
-              </DialogTrigger>
+                  <Button
+                    variant="ghost"
+                    className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
+                  >
+                    <UserRoundPen className="mr-2" /> Change
+                  </Button>
+                </DialogTrigger>
+                {croppedImgUrl.length > 0 && (
+                  <div className="w-full h-[50px] bg-dark-10 mt-[12px] p-[10px] pl-[16px] rounded-[8px] flex flex-row justify-between">
+                    <p className="text-[13px] max-sm:text-[12px] w-fit text-white font-bold self-center">
+                      You have unsaved changes!
+                    </p>
+
+                    <div className="flex flex-row">
+                      <button
+                        className="hover:underline overflow-hidden text-[13px] max-sm:text-[12px] h-auto mr-[12px] px-[16px] py-[2px]"
+                        onClick={() => onModalClose(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-[16px] py-[2px] text-center overflow-hidden text-[13px] max-sm:text-[12px] bg-green-700 hover:bg-green-800 transition rounded-[3px]"
+                        onClick={() => {
+                          onModalClose(false);
+                        }}
+                      >
+                        Save <span className="hidden sm:inline">Changes</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
               <DialogContent className="sm:max-w-[500px] bg-dark-8 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0">
                 <DialogHeader>
                   <DialogTitle>Edit profile</DialogTitle>
@@ -249,7 +305,7 @@ const MyProfileModal = () => {
           />
         )}
       </DialogContent>
-    </section>
+    </Dialog>
   );
 };
 

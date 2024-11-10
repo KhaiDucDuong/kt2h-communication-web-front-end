@@ -257,6 +257,10 @@ const DashboardPage = () => {
     }
 
     if (statusUpdate.user_id === userRef.current?.user_id) {
+      if (statusUpdate.status) {
+        console.log("Update status received contains null value!");
+        return;
+      }
       console.log("Updating user session data");
       userRef.current.status = statusUpdate.status;
       setUserSessionCookie(userRef.current);

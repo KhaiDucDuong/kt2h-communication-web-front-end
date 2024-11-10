@@ -20,14 +20,29 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserIcon, Settings, LogOut, UserRoundPen } from "lucide-react";
 import Image from "next/image";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SocketContext, UserSessionContext } from "@/types/context";
 import { logOut } from "@/services/AuthService";
 import MyProfileModal from "../MyProfile/MyProfileModal";
 
+export enum ShowMyAccountModalType {
+  NONE,
+  PROFILE,
+  SETTING,
+}
+
 const MyAccountModal = () => {
   const socketContext = useContext(SocketContext);
   const userSessionContext = useContext(UserSessionContext);
+  const [showModalType, setShowModalType] = useState<ShowMyAccountModalType>(
+    ShowMyAccountModalType.NONE
+  );
+
+  useEffect(() => {
+    return () => {
+      setShowModalType(ShowMyAccountModalType.NONE);
+    };
+  }, []);
 
   const handleLogOut = async () => {
     if (!socketContext?.stompClient) {
@@ -37,10 +52,11 @@ const MyAccountModal = () => {
     }
   };
 
-  if(!userSessionContext || !userSessionContext.currentUser) return <div>User context is null or current user is undefined</div>
+  if (!userSessionContext || !userSessionContext.currentUser)
+    return <div>User context is null or current user is undefined</div>;
 
   return (
-    <Dialog>
+    <section className="flex justify-center">
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none">
           <Image
@@ -63,13 +79,17 @@ const MyAccountModal = () => {
         >
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DialogTrigger asChild className="outline-none">
-            <DropdownMenuItem className="cursor-pointer">
-              <UserIcon className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => setShowModalType(ShowMyAccountModalType.PROFILE)}
+          >
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => setShowModalType(ShowMyAccountModalType.SETTING)}
+          >
             <Settings className="mr-2 h-4 w-4" />
             <span>Setting</span>
           </DropdownMenuItem>
@@ -79,8 +99,8 @@ const MyAccountModal = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <MyProfileModal />
-    </Dialog>
+      <MyProfileModal show={showModalType === ShowMyAccountModalType.PROFILE} setShow={setShowModalType}/>
+    </section>
   );
 };
 
