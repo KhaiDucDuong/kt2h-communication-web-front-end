@@ -52,7 +52,7 @@ const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
             {contact.to_user_nickname}
           </p>
           {props.contactStatus === UserStatus.OFFLINE && (
-            <p className="text-gray-5">{`last online at ${getLastSentDisplayDateTime(
+            <p className="text-gray-10">{`last online at ${getLastSentDisplayDateTime(
               toUserLastActivityDate
             )}`}</p>
           )}
