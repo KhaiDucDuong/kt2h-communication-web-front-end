@@ -291,6 +291,7 @@ const DashboardPage = () => {
         <UserSessionContext.Provider
           value={{
             currentUser,
+            setCurrentUser
           }}
         >
           <SideNavbar currentTab={currentTab} setCurrentTab={setCurrentTab} />

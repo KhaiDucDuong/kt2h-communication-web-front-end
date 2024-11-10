@@ -60,7 +60,7 @@ const MyAccountModal = () => {
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none">
           <Image
-            className="rounded-full m-auto hover:cursor-pointer"
+            className="rounded-full size-[48px] m-auto hover:cursor-pointer"
             src={
               userSessionContext.currentUser.image === null
                 ? "/assets/images/profile-pic.jpg"

@@ -9,19 +9,18 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { UserIcon, Settings, LogOut, UserRoundPen } from "lucide-react";
+import { LucideLoaderCircle, UserRoundPen } from "lucide-react";
 import { UserSessionContext } from "@/types/context";
 import Image from "next/image";
 import {
   Dispatch,
+  MouseEvent,
   SetStateAction,
   useContext,
-  useEffect,
-  useRef,
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
-import { UserStatus } from "@/types/user";
+import { getUserDataFromResponse, UserData, UserStatus } from "@/types/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import ResizeImageModal from "./ResizeImageModal";
@@ -30,6 +29,8 @@ import {
   INVALID_IMG_FILE_TYPE,
 } from "@/types/const/ErrorMessage";
 import { ShowMyAccountModalType } from "../SideNavbar/MyAccountModal";
+import { UserDataOnlyResponse } from "@/types/response";
+import { setUserSessionCookie } from "@/services/AuthService";
 
 const ACCEPTED_FILE_TYPE = [
   "image/jpeg",
@@ -57,9 +58,15 @@ const MyProfileModal = (props: MyProfileModalProps) => {
   const [selectedFileError, setSelectedFileError] = useState<string>("");
   const [isEditingImg, setIsEditingImg] = useState<boolean>(false);
   const [croppedImgUrl, setCroppedImgUrl] = useState<string>("");
+  const [isUploadingImg, setIsUploadingImg] = useState(false);
 
   function onModalClose(open: boolean) {
     if (open) return;
+    resetStates();
+    setShow(ShowMyAccountModalType.NONE);
+  }
+
+  function resetStates() {
     setImgFile(undefined);
     setImgPath("");
     setImgType("");
@@ -67,7 +74,59 @@ const MyProfileModal = (props: MyProfileModalProps) => {
     setSelectedFileError("");
     setIsEditingImg(false);
     setCroppedImgUrl("");
-    setShow(ShowMyAccountModalType.NONE);
+  }
+
+  async function onSaveChanges(e: MouseEvent) {
+    setIsUploadingImg(true);
+    const success = await sendUpdateProfileImgApi();
+    if (success) {
+      resetStates();
+      setIsUploadingImg(false);
+    } else {
+      setSelectedFileError("Failed to update profile picture");
+      setIsUploadingImg(false);
+    }
+  }
+
+  async function sendUpdateProfileImgApi() {
+    if (!croppedImg) {
+      console.log(
+        "No image has been selected. Cannot send api to update profile pic."
+      );
+      return false;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("image", croppedImg);
+
+      const res = await fetch(`/dashboard/api/user/image`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (res.status !== 200) {
+        throw new Error("Failed to update profile pic");
+      }
+
+      const body = (await res.json()) as UserDataOnlyResponse;
+      const user: UserData | null = getUserDataFromResponse(body);
+      if (!user) throw new Error("User is null");
+      if (!userSessionContext) throw new Error("User session context is null");
+
+      let temp = userSessionContext.currentUser;
+      if (!temp) throw new Error("Current user in context is null");
+
+      if (!user.image) throw new Error("Image is null in response");
+      temp.image = user.image + `&t=${new Date().getTime()}`;
+      console.log(temp.image)
+      userSessionContext.setCurrentUser(temp);
+      setUserSessionCookie(temp);
+      return true;
+    } catch (e) {
+      console.log("Error: " + e);
+      return false;
+    }
   }
 
   if (!userSessionContext || !userSessionContext.currentUser)
@@ -128,7 +187,7 @@ const MyProfileModal = (props: MyProfileModalProps) => {
                   />
                 </div>
                 <Image
-                  className="rounded-full transition group-hover:opacity-50"
+                  className="rounded-full size-[80px] transition group-hover:opacity-50"
                   src={
                     croppedImgUrl.length > 0
                       ? croppedImgUrl
@@ -218,12 +277,16 @@ const MyProfileModal = (props: MyProfileModalProps) => {
                         Cancel
                       </button>
                       <button
-                        className="px-[16px] py-[2px] text-center overflow-hidden text-[13px] max-sm:text-[12px] bg-green-700 hover:bg-green-800 transition rounded-[3px]"
-                        onClick={() => {
-                          onModalClose(false);
-                        }}
+                        className="px-[16px] py-[2px] text-center overflow-hidden text-[13px] max-sm:text-[12px] bg-green-700 hover:bg-green-800 transition rounded-[3px] flex"
+                        onClick={onSaveChanges}
                       >
-                        Save <span className="hidden sm:inline">Changes</span>
+                        {isUploadingImg && (
+                          <LucideLoaderCircle className="animate-spin size-[15px] mr-[6px] self-center" />
+                        )}{" "}
+                        <span className="self-center">
+                          Save
+                          <span className="hidden sm:inline">{" Changes"}</span>
+                        </span>
                       </button>
                     </div>
                   </div>

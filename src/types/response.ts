@@ -1,7 +1,7 @@
 import { Contact } from "./contact";
 import { MessageType } from "./message";
 import { InvitationNotification } from "./notification";
-import { StatusUpdate, User, UserStatus } from "./user";
+import { StatusUpdate, User, UserData, UserStatus } from "./user";
 
 export interface GenericResponse {
   error: string[];
@@ -66,6 +66,10 @@ export interface UserResponse extends GenericResponse {
     token_type: string,
     user: User
   }
+}
+
+export interface UserDataOnlyResponse extends GenericResponse {
+  data: UserData
 }
 
 export interface UserStatusReponse extends GenericResponse {

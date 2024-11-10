@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserStatusReponse } from "./response";
+import { UserDataOnlyResponse, UserStatusReponse } from "./response";
 
 export enum UserRole {
   ADMIN = "ADMIN",
@@ -30,6 +30,41 @@ export interface User {
   status: UserStatus;
   default_status: UserDefaultStatus;
   role: UserRole;
+}
+
+export interface UserData {
+  user_id: string;
+  image: string | null;
+  first_name: string;
+  last_name: string;
+  email: string;
+  status: UserStatus;
+  last_activity_at: number | null;
+}
+
+export const userDataSchema: z.ZodType<UserData> = z.object({
+  user_id: z.string().uuid(),
+  image: z.string().nullable(),
+  first_name: z.string().min(1),
+  last_name: z.string().min(1),
+  email: z.string().email().min(1),
+  status: z.nativeEnum(UserStatus),
+  last_activity_at: z.number().nullable(),
+});
+
+export function getUserDataFromResponse(
+  response: UserDataOnlyResponse
+): UserData | null {
+  let userData = response.data;
+
+  try {
+    const validatedUserData = userDataSchema.parse(userData);
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+
+  return userData;
 }
 
 export interface StatusUpdate {
