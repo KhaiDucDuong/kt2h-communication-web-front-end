@@ -23,7 +23,7 @@ interface MessagePanelProps {
 const MessagePanel = (props: MessagePanelProps) => {
   const [isMoreInfoExpanded, setIsMoreInfoExpanded] = useState<boolean>(false);
   const [conversationPartnerStatus, setConversationPartnerStatus] =
-    useState<UserStatus>(props.contact.to_user_status);
+    useState<UserStatus | null>(null);
   const socketContext = useContext(SocketContext);
 
   useEffect(() => {
@@ -49,8 +49,10 @@ const MessagePanel = (props: MessagePanelProps) => {
     }
 
     subscribeToConversationPartner(props.contact, socketContext.stompClient);
+    setConversationPartnerStatus(props.contact.to_user_status);
 
     return () => {
+      setConversationPartnerStatus(null);
       if (!socketContext || !socketContext.stompClient?.connected) return;
       socketContext?.stompClient?.unsubscribe(subscribeId);
       console.log(
@@ -85,6 +87,8 @@ const MessagePanel = (props: MessagePanelProps) => {
       setConversationPartnerStatus(statusUpdate.status);
     }
   }
+
+  if(!conversationPartnerStatus) return <section className="flex flex-row size-full bg-dark-4"></section>
 
   return (
     <section className="flex flex-row size-full bg-dark-4">

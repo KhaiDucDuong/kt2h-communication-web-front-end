@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Contact } from "@/types/contact";
 import { UserStatus } from "@/types/user";
 import { getLastSentDisplayDateTime } from "@/services/ContactService";
+import { LucideLoader2 } from "lucide-react";
 
 interface ContactMessageHeaderProps {
   profileHandleClick: () => void;
@@ -24,9 +25,17 @@ interface ContactMessageHeaderProps {
 
 const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
   const { contact } = props;
-  const [toUserLastActivityDate, setToUserActivityDate] = useState<Date>(
+  const [toUserLastActivityDate, setToUserActivityDate] = useState<Date | null>(
     new Date(contact.to_user_last_activity_at * 1000)
   );
+
+  useEffect(() => {
+    setToUserActivityDate(new Date(contact.to_user_last_activity_at * 1000));
+
+    return () => {
+      setToUserActivityDate(null);
+    };
+  }, [contact.id]);
 
   return (
     <section className="flex flex-row justify-between m-auto size-full ">
@@ -51,14 +60,20 @@ const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
           <p className="mt-[4px] font-bold text-gray-4 truncate">
             {contact.to_user_nickname}
           </p>
-          {props.contactStatus === UserStatus.OFFLINE && (
+          {(props.contactStatus === UserStatus.OFFLINE && toUserLastActivityDate) && (
             <p className="text-gray-10">{`last online at ${getLastSentDisplayDateTime(
               toUserLastActivityDate
             )}`}</p>
           )}
-          {props.contactStatus === UserStatus.ONLINE && <p className="text-green-600">Online</p>}
-          {props.contactStatus === UserStatus.IDLE && <p className="text-yellow-400">Idle</p>}
-          {props.contactStatus === UserStatus.DO_NOT_DISTURB && <p className="text-red-600">Do Not Disturb</p>}
+          {props.contactStatus === UserStatus.ONLINE && (
+            <p className="text-green-600">Online</p>
+          )}
+          {props.contactStatus === UserStatus.IDLE && (
+            <p className="text-yellow-400">Idle</p>
+          )}
+          {props.contactStatus === UserStatus.DO_NOT_DISTURB && (
+            <p className="text-red-600">Do Not Disturb</p>
+          )}
         </div>
       </div>
       <div className="w-fit h-full flex flex-col justify-center">
