@@ -58,13 +58,16 @@ const MyProfileEditModal = (props: MyProfileEditModalProps) => {
     setShow(false);
   }
 
-  function onSave(e: MouseEvent){
-
-  }
+  function onSave(e: MouseEvent) {}
 
   return (
     <Dialog open={show} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-dark-8 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0">
+      <DialogContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+        className="sm:max-w-[500px] bg-dark-8 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0"
+      >
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription className="text-gray-2">
@@ -107,10 +110,20 @@ const MyProfileEditModal = (props: MyProfileEditModalProps) => {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" type="submit" className="hover:bg-red-400" onClick={onCancel}>
+          <Button
+            variant="ghost"
+            type="submit"
+            className="hover:bg-red-400"
+            onClick={onCancel}
+          >
             Cancel
           </Button>
-          <Button variant="ghost" type="submit" className="hover:bg-green-400" onClick={onSave}>
+          <Button
+            variant="ghost"
+            type="submit"
+            className="hover:bg-green-400"
+            onClick={onSave}
+          >
             Save changes
           </Button>
         </DialogFooter>
