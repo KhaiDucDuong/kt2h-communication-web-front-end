@@ -6,6 +6,7 @@ import {
   StatusUpdate,
   statusUpdateSchema,
   User,
+  userSchema,
   UserStatus,
 } from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
@@ -131,6 +132,9 @@ const DashboardPage = () => {
         // Compliant brokers will terminate the connection after any error
         console.log("Broker reported error: " + frame.headers["message"]);
         console.log("Additional details: " + frame.body);
+        //atttempt to reconnect
+        // stompClient.deactivate({ force: true });
+        connectWebSocket(currentUser);
       };
 
       stompClient.onDisconnect = function () {
@@ -139,7 +143,7 @@ const DashboardPage = () => {
         // console.log(
         //   "Unsubscribed from /user/" + currentUser?.user_id + "/private"
         // );
-        setStompClient(undefined);
+        // setStompClient(undefined);
       };
 
       stompClient.activate();
@@ -207,7 +211,12 @@ const DashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    setCurrentUser(userRef.current);
+    const parseResult = userSchema.safeParse(userRef.current);
+    if (parseResult.success) setCurrentUser(userRef.current);
+    else {
+      console.log("!!Failed to parse user data in userRef");
+      console.log("User Ref: " + JSON.stringify(userRef.current));
+    }
 
     return () => {};
   }, [userRef.current]);
@@ -257,7 +266,7 @@ const DashboardPage = () => {
     }
 
     if (statusUpdate.user_id === userRef.current?.user_id) {
-      if (statusUpdate.status) {
+      if (!statusUpdate.status) {
         console.log("Update status received contains null value!");
         return;
       }
@@ -291,7 +300,7 @@ const DashboardPage = () => {
         <UserSessionContext.Provider
           value={{
             currentUser,
-            setCurrentUser
+            setCurrentUser,
           }}
         >
           <SideNavbar currentTab={currentTab} setCurrentTab={setCurrentTab} />

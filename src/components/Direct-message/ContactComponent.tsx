@@ -41,7 +41,7 @@ const ContactComponent = (props: ContactProps) => {
           />
         </div>
         <div className="ml-[4px] flex flex-col justify-between w-full max-w-[calc(100%-86px)]">
-          <p className="text-gray-2 text-[16px] text-nowrap text-ellipsis overflow-hidden">{props.nickname}</p>
+          <p className="text-gray-2 text-[16px] text-nowrap text-ellipsis overflow-hidden">{props.name}</p>
           <p className="truncate text-gray-3 text-[13px]">
             {/* {props.isLastMessageFromUser === true && "You: "}
             {props.lastMessage} */}

@@ -10,7 +10,7 @@ export interface ContactProps extends ContactRow {
 //contact
 export interface ContactRow {
   image: string | null;
-  nickname: string;
+  name: string;
   // noMissedMessages: number;
   // isLastMessageFromUser?: boolean;
   // lastMessage?: string;
@@ -19,7 +19,7 @@ export interface ContactRow {
 
 export const contactRowSchema: z.ZodType<ContactRow> = z.object({
   image: z.string().nullable(),
-  nickname: z.string(),
+  name: z.string(),
   // noMissedMessages: z.number().min(0).max(999),
   // isLastMessageFromUser: z.boolean().optional(),
   // lastMessage: z.string().optional(),
@@ -29,9 +29,9 @@ export const contactRowSchema: z.ZodType<ContactRow> = z.object({
 export interface Contact {
   id: string;
   requester_id: string;
-  requester_nickname: string;
+  requester_nickname: string | null;
   to_user_id: string;
-  to_user_nickname: string;
+  to_user_nickname: string | null;
   to_user_image: string | null;
   to_user_first_name: string;
   to_user_last_name: string;
@@ -44,9 +44,9 @@ export interface Contact {
 export const contactSchema: z.ZodType<Contact> = z.object({
   id: z.string().uuid(),
   requester_id: z.string().uuid(),
-  requester_nickname: z.string(),
+  requester_nickname: z.string().nullable(),
   to_user_id: z.string().uuid(),
-  to_user_nickname: z.string(),
+  to_user_nickname: z.string().nullable(),
   to_user_image: z.string().nullable(),
   to_user_first_name: z.string(),
   to_user_last_name: z.string(),

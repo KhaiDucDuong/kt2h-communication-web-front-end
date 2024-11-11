@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { LucideLoaderCircle, UserRoundPen } from "lucide-react";
+import { LucideLoaderCircle, PhoneIcon, UserRoundPen, XIcon } from "lucide-react";
 import { UserSessionContext } from "@/types/context";
 import Image from "next/image";
 import {
@@ -143,7 +143,12 @@ const MyProfileModal = (props: MyProfileModalProps) => {
         }}
       >
         <DialogHeader className="flex flex-col space-y-8 mx-[24px] !text-left">
-          <DialogTitle>User profile</DialogTitle>
+          <DialogTitle className="flex justify-between">
+            <p className="self-center">User profile</p>
+            <DialogTrigger>
+              <XIcon className="cursor-pointer size-[24px] text-gray-1 hover:text-white transition" />
+            </DialogTrigger>
+          </DialogTitle>
           <div className="flex items-center space-x-10 mt-4">
             <div className="w-[80px] h-[80px] relative">
               <div
@@ -251,13 +256,21 @@ const MyProfileModal = (props: MyProfileModalProps) => {
             <Dialog>
               <section className="w-full flex flex-col">
                 {croppedImgUrl.length === 0 && (
-                  <Button
-                    variant="ghost"
-                    className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
-                    onClick={() => setIsEditingProfile(true)}
-                  >
-                    <UserRoundPen className="mr-2" /> Change
-                  </Button>
+                  <div className="w-full flex justify-end">
+                    <Button
+                      variant="ghost"
+                      className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
+                    >
+                      <PhoneIcon className="mr-2" /> Edit Phone No
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="ml-[12px] hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
+                      onClick={() => setIsEditingProfile(true)}
+                    >
+                      <UserRoundPen className="mr-2" /> Change Info
+                    </Button>
+                  </div>
                 )}
 
                 {croppedImgUrl.length > 0 && (

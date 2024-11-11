@@ -23,7 +23,11 @@ const ContactList = (props: ContactListProps) => {
           <ContactComponent
             key={contact.id}
             image={contact.to_user_image}
-            nickname={contact.to_user_nickname}
+            name={
+              contact.to_user_nickname
+                ? contact.to_user_nickname
+                : `${contact.to_user_last_name} ${contact.to_user_first_name}`
+            }
             // noMissedMessages={0}
             // isLastMessageFromUser={false}
             // lastMessage={""} lastSent={undefined}
