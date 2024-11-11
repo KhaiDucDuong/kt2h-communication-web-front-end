@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { LucideLoaderCircle, UserRoundPen } from "lucide-react";
+import { LucideLoaderCircle, PhoneIcon, UserRoundPen, XIcon } from "lucide-react";
 import { UserSessionContext } from "@/types/context";
 import Image from "next/image";
 import {
@@ -31,6 +31,7 @@ import {
 import { ShowMyAccountModalType } from "../SideNavbar/MyAccountModal";
 import { UserDataOnlyResponse } from "@/types/response";
 import { setUserSessionCookie } from "@/services/AuthService";
+import MyProfileEditModal from "./MyProfileEditModal";
 
 const ACCEPTED_FILE_TYPE = [
   "image/jpeg",
@@ -59,6 +60,7 @@ const MyProfileModal = (props: MyProfileModalProps) => {
   const [isEditingImg, setIsEditingImg] = useState<boolean>(false);
   const [croppedImgUrl, setCroppedImgUrl] = useState<string>("");
   const [isUploadingImg, setIsUploadingImg] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   function onModalClose(open: boolean) {
     if (open) return;
@@ -119,7 +121,7 @@ const MyProfileModal = (props: MyProfileModalProps) => {
 
       if (!user.image) throw new Error("Image is null in response");
       temp.image = user.image + `&t=${new Date().getTime()}`;
-      console.log(temp.image)
+      console.log(temp.image);
       userSessionContext.setCurrentUser(temp);
       setUserSessionCookie(temp);
       return true;
@@ -141,7 +143,12 @@ const MyProfileModal = (props: MyProfileModalProps) => {
         }}
       >
         <DialogHeader className="flex flex-col space-y-8 mx-[24px] !text-left">
-          <DialogTitle>User profile</DialogTitle>
+          <DialogTitle className="flex justify-between">
+            <p className="self-center">User profile</p>
+            <DialogTrigger>
+              <XIcon className="cursor-pointer size-[24px] text-gray-1 hover:text-white transition" />
+            </DialogTrigger>
+          </DialogTitle>
           <div className="flex items-center space-x-10 mt-4">
             <div className="w-[80px] h-[80px] relative">
               <div
@@ -245,24 +252,27 @@ const MyProfileModal = (props: MyProfileModalProps) => {
               {userSessionContext.currentUser.phone || ""}
             </span>
           </DialogDescription>
-          <DialogDescription className="flex items-center space-x-4">
-            <span className="font-semibold w-24 text-gray-2">Gender:</span>
-            <span className="flex-1 text-gray-4">Male</span>
-          </DialogDescription>
           <DialogFooter>
             <Dialog>
               <section className="w-full flex flex-col">
-                <DialogTrigger
-                  asChild
-                  className="outline-none w-fit px-[12px] py-[2px] self-end"
-                >
-                  <Button
-                    variant="ghost"
-                    className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
-                  >
-                    <UserRoundPen className="mr-2" /> Change
-                  </Button>
-                </DialogTrigger>
+                {croppedImgUrl.length === 0 && (
+                  <div className="w-full flex justify-end">
+                    <Button
+                      variant="ghost"
+                      className="hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
+                    >
+                      <PhoneIcon className="mr-2" /> Edit Phone No
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="ml-[12px] hover:cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-0"
+                      onClick={() => setIsEditingProfile(true)}
+                    >
+                      <UserRoundPen className="mr-2" /> Change Info
+                    </Button>
+                  </div>
+                )}
+
                 {croppedImgUrl.length > 0 && (
                   <div className="w-full h-[50px] bg-dark-10 mt-[12px] p-[10px] pl-[16px] rounded-[8px] flex flex-row justify-between">
                     <p className="text-[13px] max-sm:text-[12px] w-fit text-white font-bold self-center">
@@ -292,62 +302,10 @@ const MyProfileModal = (props: MyProfileModalProps) => {
                   </div>
                 )}
               </section>
-              <DialogContent className="sm:max-w-[500px] bg-dark-8 text-gray-2 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0">
-                <DialogHeader>
-                  <DialogTitle>Edit profile</DialogTitle>
-                  <DialogDescription className="text-gray-2">
-                    Make changes to your profile here. Click save when
-                    you&apos;re done.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4 mt-2">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="name" className="text-left">
-                      Username
-                    </label>
-                    <input
-                      id="name"
-                      defaultValue="Pedro Duarte"
-                      className="col-span-3  bg-dark-6 text-gray-4 outline-none"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="email" className="text-left">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      defaultValue="@peduarte"
-                      className="col-span-3 bg-dark-6 text-gray-4 outline-none"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="phone" className="text-left">
-                      Phone
-                    </label>
-                    <input
-                      id="phone"
-                      defaultValue="0914712845"
-                      className="col-span-3 bg-dark-6 text-gray-4 outline-none"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="gender" className="text-left">
-                      Gender
-                    </label>
-                    <input
-                      id="gender"
-                      defaultValue="Gay"
-                      className="col-span-3 bg-dark-6 text-gray-4 outline-none"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="ghost" type="submit">
-                    Save changes
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
+              <MyProfileEditModal
+                show={isEditingProfile}
+                setShow={setIsEditingProfile}
+              />
             </Dialog>
           </DialogFooter>
         </div>

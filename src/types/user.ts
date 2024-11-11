@@ -32,6 +32,18 @@ export interface User {
   role: UserRole;
 }
 
+export const userSchema: z.ZodType<User> = z.object({
+  user_id: z.string().uuid(),
+  image: z.string().nullable(),
+  first_name: z.string().min(1),
+  last_name: z.string().min(1),
+  email: z.string().email().min(1),
+  phone: z.string().nullable(),
+  status: z.nativeEnum(UserStatus),
+  default_status: z.nativeEnum(UserDefaultStatus),
+  role: z.nativeEnum(UserRole),
+});
+
 export interface UserData {
   user_id: string;
   image: string | null;

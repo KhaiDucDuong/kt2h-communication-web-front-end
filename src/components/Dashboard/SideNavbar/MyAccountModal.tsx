@@ -45,6 +45,7 @@ const MyAccountModal = () => {
   }, []);
 
   const handleLogOut = async () => {
+    console.log("****Logging out****");
     if (!socketContext?.stompClient) {
       logOut();
     } else {
@@ -99,7 +100,10 @@ const MyAccountModal = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <MyProfileModal show={showModalType === ShowMyAccountModalType.PROFILE} setShow={setShowModalType}/>
+      <MyProfileModal
+        show={showModalType === ShowMyAccountModalType.PROFILE}
+        setShow={setShowModalType}
+      />
     </section>
   );
 };

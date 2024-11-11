@@ -66,13 +66,13 @@ const SideNavbar = (props: SideNavbarProps) => {
               isSelected={props.currentTab === DashboardTab.FRIENDS}
             />
           </div>
-          <div>
+          {/* <div>
             <CustomIcon
               faIcon={faBell}
               fontSize={26}
               isSelected={pathname === "/notifications" ? true : false}
             />
-          </div>
+          </div> */}
         </div>
         <div>
           <div
