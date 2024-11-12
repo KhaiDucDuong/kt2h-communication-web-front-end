@@ -50,19 +50,20 @@ const MyProfileEditModal = (props: MyProfileEditModalProps) => {
   const userSessionContext = useContext(UserSessionContext);
   const user = userSessionContext?.currentUser;
   const setUser = userSessionContext?.setCurrentUser;
+  const [firstName, setFirstName] = useState<string | undefined>(
+    user?.first_name
+  );
+  const [lastName, setLastName] = useState<string | undefined>(user?.last_name);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  if (!user || !setUser)
+  if (!user || !setUser || !firstName || !lastName)
     return (
       <DialogContent className="sm:max-w-[500px] h-[308px] flex justify-center text-gray-2 bg-dark-8 shadow-2xl  ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0">
         <LoaderCircleIcon className="animate-spin size-[32px] m-auto" />
       </DialogContent>
     );
-
-  const [firstName, setFirstName] = useState<string>(user.first_name);
-  const [lastName, setLastName] = useState<string>(user.last_name);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   function resetState() {
     if (!user) return;
@@ -98,6 +99,8 @@ const MyProfileEditModal = (props: MyProfileEditModalProps) => {
   }
 
   async function sendRequestUpdateProfile() {
+    if (!firstName || !lastName) return false;
+
     const bodyData = {
       first_name: firstName.trimEnd().trimStart(),
       last_name: lastName.trimEnd().trimStart(),

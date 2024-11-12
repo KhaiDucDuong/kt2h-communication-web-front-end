@@ -286,7 +286,7 @@ export async function logOut(isRedirect: boolean = true) {
 
 export async function getAccessToken(
   redirectIfFail: boolean = true
-): Promise<String> {
+): Promise<string> {
   const cookieStore = cookies();
   let accessToken = cookieStore.get("access_token");
 
