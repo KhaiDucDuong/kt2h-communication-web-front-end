@@ -3,9 +3,10 @@
 import { Client } from "@stomp/stompjs";
 import { createContext, useEffect, useRef, useState } from "react";
 import {
-  SocketStatusUpdate,
-  socketStatusUpdateSchema,
+  StatusUpdate,
+  statusUpdateSchema,
   User,
+  userSchema,
   UserStatus,
 } from "@/types/user";
 import { getCurrentUser } from "@/services/UserService";
@@ -69,7 +70,7 @@ const DashboardPage = () => {
         console.log("Set current user data");
         setCurrentUser(data);
         userRef.current = data;
-        wasActiveRef.current = (data.status === UserStatus.ONLINE);
+        wasActiveRef.current = data.status === UserStatus.ONLINE;
       }
       return data;
     }
@@ -131,6 +132,9 @@ const DashboardPage = () => {
         // Compliant brokers will terminate the connection after any error
         console.log("Broker reported error: " + frame.headers["message"]);
         console.log("Additional details: " + frame.body);
+        //atttempt to reconnect
+        // stompClient.deactivate({ force: true });
+        connectWebSocket(currentUser);
       };
 
       stompClient.onDisconnect = function () {
@@ -139,7 +143,7 @@ const DashboardPage = () => {
         // console.log(
         //   "Unsubscribed from /user/" + currentUser?.user_id + "/private"
         // );
-        setStompClient(undefined);
+        // setStompClient(undefined);
       };
 
       stompClient.activate();
@@ -207,7 +211,12 @@ const DashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    setCurrentUser(userRef.current);
+    const parseResult = userSchema.safeParse(userRef.current);
+    if (parseResult.success) setCurrentUser(userRef.current);
+    else {
+      console.log("!!Failed to parse user data in userRef");
+      console.log("User Ref: " + JSON.stringify(userRef.current));
+    }
 
     return () => {};
   }, [userRef.current]);
@@ -246,18 +255,21 @@ const DashboardPage = () => {
   };
 
   const onStatusUpdate = async (payload: any) => {
-    const statusUpdate = JSON.parse(payload.body) as SocketStatusUpdate;
+    const statusUpdate = JSON.parse(payload.body) as StatusUpdate;
     console.log("Receive a status update");
     // console.log(JSON.stringify(payload.body));
     try {
-      const validatedStatusUpdate =
-        socketStatusUpdateSchema.parse(statusUpdate);
+      const validatedStatusUpdate = statusUpdateSchema.parse(statusUpdate);
     } catch (error) {
       console.log("Invalid status update payload");
       return;
     }
 
     if (statusUpdate.user_id === userRef.current?.user_id) {
+      if (!statusUpdate.status) {
+        console.log("Update status received contains null value!");
+        return;
+      }
       console.log("Updating user session data");
       userRef.current.status = statusUpdate.status;
       setUserSessionCookie(userRef.current);
@@ -288,6 +300,7 @@ const DashboardPage = () => {
         <UserSessionContext.Provider
           value={{
             currentUser,
+            setCurrentUser,
           }}
         >
           <SideNavbar currentTab={currentTab} setCurrentTab={setCurrentTab} />

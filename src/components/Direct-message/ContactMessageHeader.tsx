@@ -9,8 +9,8 @@ import {
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Contact } from "@/types/contact";
-import { UserStatus } from "@/types/user";
-import { getLastSentDisplayDateTime } from "@/services/ContactService";
+import { getStatusUpdateFromResponse, UserStatus } from "@/types/user";
+import { UserStatusReponse } from "@/types/response";
 
 interface ContactMessageHeaderProps {
   profileHandleClick: () => void;
@@ -24,9 +24,40 @@ interface ContactMessageHeaderProps {
 
 const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
   const { contact } = props;
-  const [toUserLastActivityDate, setToUserActivityDate] = useState<Date>(
-    new Date(contact.to_user_last_activity_at * 1000)
+  const [contactStatus, setContactStatus] = useState<UserStatus | null>(
+    contact.to_user_status
   );
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchContactStatus() {
+      const res = await fetch(
+        `/dashboard/api/contact/status?id=${contact.to_user_id}`,
+        {
+          method: "GET",
+        }
+      );
+      const body = (await res.json()) as UserStatusReponse;
+      if (!res.ok) {
+        console.log("Failed to fetch contact's status");
+      } else {
+        if (ignore) return;
+        const statusUpdate = getStatusUpdateFromResponse(body);
+        if (statusUpdate === null) return;
+        console.log(statusUpdate.user_id === contact.to_user_id)
+        if (statusUpdate.user_id === contact.to_user_id)
+          setContactStatus(statusUpdate.status);
+      }
+    }
+
+    fetchContactStatus()
+
+    return () => {
+      ignore = true;
+      setContactStatus(null);
+    };
+  }, [contact.id]);
 
   return (
     <section className="flex flex-row justify-between m-auto size-full ">
@@ -51,14 +82,18 @@ const ContactMessageHeader = (props: ContactMessageHeaderProps) => {
           <p className="mt-[4px] font-bold text-gray-4 truncate">
             {contact.to_user_nickname}
           </p>
-          {props.contactStatus === UserStatus.OFFLINE && (
-            <p className="text-gray-5">{`last online at ${getLastSentDisplayDateTime(
-              toUserLastActivityDate
-            )}`}</p>
+          {contactStatus === UserStatus.OFFLINE && (
+            <p className="text-gray-10">Offline</p>
           )}
-          {props.contactStatus === UserStatus.ONLINE && <p className="text-green-600">Online</p>}
-          {props.contactStatus === UserStatus.IDLE && <p className="text-yellow-400">Idle</p>}
-          {props.contactStatus === UserStatus.DO_NOT_DISTURB && <p className="text-red-600">Do Not Disturb</p>}
+          {contactStatus === UserStatus.ONLINE && (
+            <p className="text-green-600">Online</p>
+          )}
+          {contactStatus === UserStatus.IDLE && (
+            <p className="text-yellow-400">Idle</p>
+          )}
+          {contactStatus === UserStatus.DO_NOT_DISTURB && (
+            <p className="text-red-600">Do Not Disturb</p>
+          )}
         </div>
       </div>
       <div className="w-fit h-full flex flex-col justify-center">

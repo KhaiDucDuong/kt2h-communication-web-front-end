@@ -31,7 +31,7 @@ const FriendRow = (props: {
             alt={props.firstName + " " + props.lastName + "s profile pic"}
             width={50}
             height={50}
-            className="rounded-full mr-[10px]"
+            className="rounded-full mr-[10px] size-[50px]"
           />
         </div>
         <div className="self-center">

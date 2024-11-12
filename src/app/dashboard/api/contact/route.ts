@@ -33,6 +33,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<{body?:Con
 
     const data = await result.json();
     console.log("Contacts data: ", data);
+    console.log("Detailed Contacts data: ", JSON.stringify(data));
     return NextResponse.json(data as ContactResponse, { status: 200 });
   } catch(error) {
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

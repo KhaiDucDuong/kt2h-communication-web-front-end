@@ -17,6 +17,7 @@ interface DirectMessageProps {
 
 const DirectMessage = (props: DirectMessageProps) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [contactPage, setContactPage] = useState<number>(1);
   const [hasMoreContacts, setHasMoreContacts] = useState<boolean>(true);
@@ -39,6 +40,7 @@ const DirectMessage = (props: DirectMessageProps) => {
         setContacts((prev) => [...prev, ...fetchedContacts]);
         setContactPage(body.data.meta.page + 1);
         setHasMoreContacts(body.data.meta.page < body.data.meta.pages);
+        setIsFetching(false);
       }
     };
 
@@ -46,6 +48,10 @@ const DirectMessage = (props: DirectMessageProps) => {
 
     return () => {
       ignore = true;
+      setIsFetching(true);
+      setSelectedContact(null);
+      setContactPage(1);
+      setHasMoreContacts(true);
     };
   }, []);
 
@@ -55,6 +61,7 @@ const DirectMessage = (props: DirectMessageProps) => {
         contacts={contacts}
         selectedContact={selectedContact}
         onSelectContact={setSelectedContact}
+        isFetching={isFetching}
       />
       {selectedContact ? (
         <MessagePanel
