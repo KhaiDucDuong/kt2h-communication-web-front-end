@@ -5,7 +5,7 @@ import { getAccessToken } from "@/services/AuthService";
 export interface UploadImageMessages {
   serverErrors?: string[];
   successMessage?: string;
-  imageUrl?: string;
+  body?: any;
 }
 
 export async function uploadImage(
@@ -56,7 +56,7 @@ export async function uploadImage(
     if (response.ok) {
       return {
         successMessage: "Image uploaded successfully!",
-        imageUrl: result.data.imageUrl || result, // Sử dụng URL nếu có
+        body: result.data, // Sử dụng URL nếu có
       };
     }
 

@@ -5,7 +5,8 @@ import { ConversationMessageResponse } from "./response";
 export enum MessageType {
     TEXT = "TEXT",
     RECORDING = "RECORDING",
-    IMAGE = "IMAGE" // Added IMAGE type
+    IMAGE = "IMAGE",
+    IMAGE_AND_TEXT = "IMAGE_AND_TEXT" // Added IMAGE type
 }
 
 // Interface representing a single message
@@ -16,7 +17,7 @@ export interface Message {
     message_type: MessageType;
     is_reacted: boolean;
     sent_at: number;
-    image_url: string | null; // Optional image URL field
+    image_urls: string[]; // Optional image URL field
 }
 
 // Interface representing a group of messages from the same sender
@@ -34,14 +35,18 @@ export const messageSchema: z.ZodType<Message> = z.object({
     is_reacted: z.boolean(),
     sent_at: z.number(),
     message: z.string().min(0), // Ensures message has at least 1 character
-    image_url: z.string().nullable() // Optional image URL validation
+    image_urls: z.string().array() // Optional image URL validation
 }).refine((data) => {
     if (data.message_type === MessageType.TEXT) {
         return data.message.length >= 1; // Text messages must have content
+    } else if (data.message_type === MessageType.IMAGE) {
+        return data.image_urls !== null; // Ensure image URL exists for image messages
+    } else if (data.message_type === MessageType.IMAGE_AND_TEXT) {
+        return data.message.length >= 1 && data.image_urls !== null; // Must have both text and image URL for IMAGE_AND_TEXT
     }
     return true; // Other message types are valid by default
 }, {
-    message: "Text messages must have at least 1 character or provide an image URL for image messages",
+    message: "Message must contain content for TEXT type or provide an image URL for IMAGE type",
     path: ["message"],
 });
 
@@ -53,19 +58,19 @@ export function getMessagesFromResponse(
     for (const messageResponse of response.data.result) {
         const message: Message = {
             id: messageResponse.id,
-            message: messageResponse.message,
+            message: messageResponse.message ,
             sender_id: messageResponse.sender_id,
             message_type: messageResponse.message_type,
             is_reacted: messageResponse.is_reacted,
             sent_at: messageResponse.sent_at,
-            image_url: messageResponse.image_url // Ensure to include the image URL if present
+            image_urls: messageResponse.image_urls // Ensure to include the image URL if present
         };
 
         try {
             messageSchema.parse(message); // Validate message
             messageList.push(message);
         } catch (e) {
-            console.log(e);
+            console.log("Validation failed:", e);
             return null; // Return null if validation fails
         }
     }
@@ -75,7 +80,7 @@ export function getMessagesFromResponse(
 // Function to group messages from the same sender
 export function groupMessagesFromSameSender(messages: Message[]): MessageGroup[] {
     const groupedMessages: MessageGroup[] = [];
-    for (const message of messages.toReversed()) {
+    for (const message of messages.reverse()) { // Replace toReversed with reverse
         if (
             groupedMessages.length === 0 ||
             groupedMessages[groupedMessages.length - 1].sender_id !== message.sender_id ||
