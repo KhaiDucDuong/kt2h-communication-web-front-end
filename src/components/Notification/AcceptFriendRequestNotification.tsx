@@ -30,7 +30,7 @@ const AcceptFriendRequestNotification = (
       </div>
       <div className="w-full h-fit">
         <div className="text-gray-3">
-          <span className="text-gray-2">{`${notification.friend_request.receiver_last_name} ${notification.friend_request.receiver_last_name}`}</span>{" "}
+          <span className="text-gray-2">{`${notification.friend_request.receiver_last_name} ${notification.friend_request.receiver_first_name}`}</span>{" "}
           has accepted your friend request.
         </div>
         <div className="text-gray-3 text-[12px]">

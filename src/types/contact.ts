@@ -10,7 +10,7 @@ export interface ContactProps extends ContactRow {
 //contact
 export interface ContactRow {
   image: string | null;
-  nickname: string | null;
+  name: string;
   // noMissedMessages: number;
   // isLastMessageFromUser?: boolean;
   // lastMessage?: string;
@@ -19,7 +19,7 @@ export interface ContactRow {
 
 export const contactRowSchema: z.ZodType<ContactRow> = z.object({
   image: z.string().nullable(),
-  nickname: z.string().nullable(),
+  name: z.string(),
   // noMissedMessages: z.number().min(0).max(999),
   // isLastMessageFromUser: z.boolean().optional(),
   // lastMessage: z.string().optional(),
