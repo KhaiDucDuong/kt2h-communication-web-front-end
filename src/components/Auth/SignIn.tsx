@@ -13,6 +13,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+// @ts-ignore
 import { useFormState, useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
