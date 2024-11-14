@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { User } from "@/types/user";
+import { Plus } from 'lucide-react';
 interface GroupAddFormProps {
   onGroupAdded: () => Promise<void>; // Function that will be called after a group is added
 }
@@ -57,8 +57,8 @@ export function GroupAddForm({onGroupAdded}:GroupAddFormProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
       <button 
-        className="w-12 h-12 rounded-full bg-blue-500 text-white flex justify-center items-center shadow-lg hover:bg-blue-600">
-        <span className="pointer-events-none select-none" aria-hidden="true">+</span>
+        className="w-12 h-12 rounded-full bg-dark-9 text-white flex justify-center items-center shadow-lg hover:bg-green-600">
+        <span className="pointer-events-none select-none" aria-hidden="true"><Plus size={20}/></span>
       </button>
             </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] bg-dark-9 text-white ring-0 border-0 select-none">
@@ -82,7 +82,7 @@ export function GroupAddForm({onGroupAdded}:GroupAddFormProps) {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" className ="bg-dark-6  select-none">Create</Button>
+          <Button type="submit" className ="bg-dark-6  select-none">Create group</Button>
         </DialogFooter>
         </form>
       </DialogContent>

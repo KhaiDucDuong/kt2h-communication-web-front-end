@@ -9,7 +9,6 @@ interface ConversationMessageProps {
   senderName?: string;
   senderImage: string | null;
   messages: Message[];
-  attachedImages?: string[];
   sticker?: string[]; // sẽ cập nhật sau
   icon?: string[]; // sẽ cập nhật sau
   isLastMessage: boolean;
@@ -59,20 +58,39 @@ const ConversationMessage = (props: ConversationMessageProps) => {
 
         {props.messages.map((message) => (
           <div key={message.id} id={message.id} className="mb-[4px]">
-            {message.image_url && (
-              <Image
-                src={message.image_url}
-                width={150} // Điều chỉnh kích thước hình ảnh nếu cần
-                height={150}
-                alt={`Image from ${props.senderName}`}
-                className="rounded-lg mb-[4px] self-start" // Căn chỉnh hình ảnh
-              />
-            )}
-            {message.message && (
-              <div className={cn("rounded-[8px] bg-gray-5 px-[12px] py-[8px] mb-[4px] w-fit", props.fromUser && "self-end")}>
+            {/* Kiểm tra loại tin nhắn */}
+            {message.image_urls.length > 0 && message.message ? (
+              // Trường hợp cả hình ảnh và văn bản
+              <div className={cn("rounded-[8px] bg-gray-5 px-[12px] py-[8px] w-fit", props.fromUser ? "self-end" : "self-start")}>
+                {message.image_urls.map( (image) => {
+                  return <Image
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt={`Image from ${props.senderName}`}
+                  className="rounded-lg mb-[4px]"/>
+                })}
+                
                 <p className="wrap text-dark-9">{message.message}</p>
               </div>
-            )}
+            ) : message.image_urls.length > 0 ? (
+              // Trường hợp chỉ có hình ảnh
+              <div className={cn("rounded-[8px] w-fit", props.fromUser ? "self-end" : "self-start")}>
+                {message.image_urls.map( (image) => {
+                  return <Image
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt={`Image from ${props.senderName}`}
+                  className="rounded-lg mb-[4px]"/>
+                })} 
+              </div>
+            ) : message.message ? (
+              // Trường hợp chỉ có văn bản
+              <div className={cn("rounded-[8px] bg-gray-5 px-[12px] py-[8px] mb-[4px] w-fit", props.fromUser ? "self-end" : "self-start")}>
+                <p className="wrap text-dark-9">{message.message}</p>
+              </div>
+            ) : null}
           </div>
         ))}
       </div>

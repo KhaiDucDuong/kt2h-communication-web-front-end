@@ -49,7 +49,7 @@ export interface ConversationMessageResponse extends GenericResponse {
       message_type: MessageType;
       is_reacted: boolean;
       sent_at: number;
-      image_url: string | null; // Optional field for image URL
+      image_urls: string[]; // Optional field for image URL
     }[];
   };
 }
