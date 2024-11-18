@@ -20,26 +20,23 @@ interface ConversationProps {
 }
 
 const Conversation = (props: ConversationProps) => {
-  const {contact} = props;
+  const { contact } = props;
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageGroups, setMessageGroups] = useState<MessageGroup[]>([]);
   const [messagePage, setMessagePage] = useState<number>(1);
   const [hasMoreMessages, setHasMoreMessages] = useState<boolean>(true);
   const userSessionContext = useContext(UserSessionContext);
   const currentUser = userSessionContext?.currentUser;
-  if(!currentUser) return <div>User session data is undefined</div>
-  
 
   useEffect(() => {
     let ignore = false;
 
     fetchMessages(ignore, 1, contact.id);
 
-
     return () => {
       ignore = true;
-      setMessages([])
-      setMessageGroups([])
+      setMessages([]);
+      setMessageGroups([]);
       setMessagePage(1);
       setHasMoreMessages(true);
     };
@@ -76,7 +73,13 @@ const Conversation = (props: ConversationProps) => {
     }
   }, [props.newConversationMessage]);
 
-  async function fetchMessages(ignore: boolean, messagePage: number, contactId: string) {
+  if (!currentUser) return <div>User session data is undefined</div>;
+
+  async function fetchMessages(
+    ignore: boolean,
+    messagePage: number,
+    contactId: string
+  ) {
     const res = await fetch(
       `/dashboard/api/message?conversationId=${contactId}&page=${messagePage}`,
       {
@@ -101,7 +104,7 @@ const Conversation = (props: ConversationProps) => {
   return (
     <section className="size-full flex flex-col">
       {contact.id}
-      {" Message length: " +messages.length}
+      {" Message length: " + messages.length}
       <ScrollArea className="size-full p-[12px]">
         {messageGroups.map((messageGroup, i, { length }) => {
           //last element
@@ -110,16 +113,22 @@ const Conversation = (props: ConversationProps) => {
               <div key={messageGroup.messages.at(0)?.id}>
                 <ConversationMessage
                   sentDateTime={new Date(messageGroup.sentDateTime)}
-                  fromUser={
-                    messageGroup.sender_id === contact.requester_id
-                  }
+                  fromUser={messageGroup.sender_id === contact.requester_id}
                   messages={messageGroup.messages}
                   senderName={
                     messageGroup.sender_id === currentUser.user_id
-                      ? (contact.requester_nickname ? contact.requester_nickname : `${currentUser.last_name} ${currentUser.first_name}`)
-                      : (contact.to_user_nickname? contact.to_user_nickname : `${contact.to_user_last_name} ${contact.to_user_first_name}`)
+                      ? contact.requester_nickname
+                        ? contact.requester_nickname
+                        : `${currentUser.last_name} ${currentUser.first_name}`
+                      : contact.to_user_nickname
+                      ? contact.to_user_nickname
+                      : `${contact.to_user_last_name} ${contact.to_user_first_name}`
                   }
-                  senderImage={messageGroup.sender_id === currentUser.user_id ? currentUser.image : contact.to_user_image}
+                  senderImage={
+                    messageGroup.sender_id === currentUser.user_id
+                      ? currentUser.image
+                      : contact.to_user_image
+                  }
                   isLastMessage={true}
                 />
               </div>
@@ -129,16 +138,22 @@ const Conversation = (props: ConversationProps) => {
               <div key={messageGroup.messages.at(0)?.id}>
                 <ConversationMessage
                   sentDateTime={messageGroup.sentDateTime}
-                  fromUser={
-                    messageGroup.sender_id === currentUser.user_id
-                  }
+                  fromUser={messageGroup.sender_id === currentUser.user_id}
                   messages={messageGroup.messages}
                   senderName={
                     messageGroup.sender_id === currentUser.user_id
-                    ? (contact.requester_nickname ? contact.requester_nickname : `${currentUser.last_name} ${currentUser.first_name}`)
-                    : (contact.to_user_nickname? contact.to_user_nickname : `${contact.to_user_last_name} ${contact.to_user_first_name}`)
+                      ? contact.requester_nickname
+                        ? contact.requester_nickname
+                        : `${currentUser.last_name} ${currentUser.first_name}`
+                      : contact.to_user_nickname
+                      ? contact.to_user_nickname
+                      : `${contact.to_user_last_name} ${contact.to_user_first_name}`
                   }
-                  senderImage={messageGroup.sender_id === currentUser.user_id ? currentUser.image : contact.to_user_image}
+                  senderImage={
+                    messageGroup.sender_id === currentUser.user_id
+                      ? currentUser.image
+                      : contact.to_user_image
+                  }
                   isLastMessage={false}
                 />
               </div>
@@ -146,10 +161,7 @@ const Conversation = (props: ConversationProps) => {
           }
         })}
       </ScrollArea>
-      <MessageBox
-        currentUser={currentUser}
-        contactId={contact.id}
-      />
+      <MessageBox currentUser={currentUser} contactId={contact.id} />
     </section>
   );
 };

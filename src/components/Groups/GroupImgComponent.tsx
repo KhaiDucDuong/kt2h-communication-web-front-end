@@ -129,7 +129,7 @@ const GroupImgComponent = (props: GroupProp & { onGroupUpdated: () => Promise<vo
             <DialogHeader>
             <DialogTitle>Edit Groupchat</DialogTitle>
             <DialogDescription className ="text-white">
-              Click Edit when you're done.
+              Click Edit when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={(event) => { event.preventDefault(); handleEditGroup(event); }}>

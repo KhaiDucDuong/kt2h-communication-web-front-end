@@ -4,6 +4,7 @@ import { SignInMessages, signUp } from "@/services/AuthService";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
+// @ts-ignore
 import { useFormState, useFormStatus } from "react-dom";
 
 function SubmitButton() {

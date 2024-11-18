@@ -64,6 +64,7 @@ const ConversationMessage = (props: ConversationMessageProps) => {
               <div className={cn("rounded-[8px] bg-gray-5 px-[12px] py-[8px] w-fit", props.fromUser ? "self-end" : "self-start")}>
                 {message.image_urls.map( (image) => {
                   return <Image
+                  key={image}
                   src={image}
                   width={150}
                   height={150}
@@ -78,6 +79,7 @@ const ConversationMessage = (props: ConversationMessageProps) => {
               <div className={cn("rounded-[8px] w-fit", props.fromUser ? "self-end" : "self-start")}>
                 {message.image_urls.map( (image) => {
                   return <Image
+                  key={image}
                   src={image}
                   width={150}
                   height={150}

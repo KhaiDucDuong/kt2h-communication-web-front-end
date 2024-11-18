@@ -16,6 +16,10 @@ FROM node:${NODE_VERSION}-alpine as base
 # Set working directory for all build stages.
 WORKDIR /src/app
 
+# Create nodejs group and nextjs user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
 # Install pnpm.
 RUN --mount=type=cache,target=/root/.npm \
     npm install -g pnpm@${PNPM_VERSION}
@@ -58,7 +62,7 @@ FROM base as final
 ENV NODE_ENV production
 
 # Run the application as a non-root user.
-USER node
+USER nextjs
 
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
@@ -66,8 +70,9 @@ COPY package.json .
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
 COPY --from=deps /src/app/node_modules ./node_modules
-COPY --from=build /src/app/.next ./.next
+COPY  --chown=nextjs:nodejs --from=build /src/app/.next ./.next
 COPY --from=build /src/app/public ./public
+COPY --from=build /src/app/next.config.mjs ./
 
 
 # Expose the port that the application listens on.
