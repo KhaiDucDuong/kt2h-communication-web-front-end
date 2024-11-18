@@ -31,6 +31,7 @@ import {
 import { DashboardTab } from "@/types/ui";
 import { SocketContext, UserSessionContext } from "@/types/context";
 import { getAccessToken, setUserSessionCookie } from "@/services/AuthService";
+import InitialLoading from "@/components/Dashboard/InitialLoading";
 
 const IDLE_INTERVAL_TIME = 1000 * 60 * 5; // 1000 * 60 * 5 = 300,000 ms = 5 minutes
 const events = [
@@ -279,10 +280,7 @@ const DashboardPage = () => {
 
   if (!stompClient || !currentUser) {
     return (
-      <div>
-        Loading...{" "}
-        {"Stomp: " + String(stompClient) + " User: " + String(currentUser)}
-      </div>
+      <InitialLoading />
     );
   }
 

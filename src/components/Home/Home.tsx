@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   MessageCircle,
   Users,
-  Shield,
+  Headset,
   Github,
   Twitter,
   Linkedin,
@@ -100,7 +100,7 @@ export default function Home() {
             {
               icon: MessageCircle,
               title: "Real-Time Messaging",
-              description: "Instant communication with end-to-end encryption.",
+              description: "Instant communication with anyone from anywhere.",
             },
             {
               icon: Users,
@@ -108,10 +108,10 @@ export default function Home() {
               description: "Create and manage channels for team collaboration.",
             },
             {
-              icon: Shield,
-              title: "Secure Communication",
+              icon: Headset,
+              title: "Video Calls",
               description:
-                "Your privacy and data security is our top priority.",
+                "Connect with your friends with voice and video calls.",
             },
           ].map((feature, index) => (
             <Card
