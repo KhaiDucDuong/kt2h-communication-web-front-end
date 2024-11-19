@@ -82,8 +82,8 @@ const DashboardPage = () => {
       const accessToken = await getAccessToken(true);
       const stompClient = new Client({
         brokerURL: stompClientUrl,
-        heartbeatIncoming: 60000, // Expect a heartbeat every 60 seconds from the server
-        heartbeatOutgoing: 60000, // Send a heartbeat every 60 seconds to the server
+        heartbeatIncoming: 30000, // Expect a heartbeat every 30 seconds from the server
+        heartbeatOutgoing: 30000, // Send a heartbeat every 30 seconds to the server
         // connectionTimeout: 15000, //maximum 15 seconds to establish connection to the server
         reconnectDelay: 5000, // Reconnect after 5 seconds if disconnected
         // discardWebsocketOnCommFailure: true,
