@@ -59,8 +59,8 @@ export default function InitialLoading() {
           <Image
             src="/assets/images/app_logo.png"
             alt="kt2h icon"
-            width={50}
-            height={50}
+            width={200}
+            height={200}
             className="size-full"
           />
         </motion.div>
