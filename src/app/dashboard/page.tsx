@@ -82,9 +82,11 @@ const DashboardPage = () => {
       const accessToken = await getAccessToken(true);
       const stompClient = new Client({
         brokerURL: stompClientUrl,
-        heartbeatIncoming: 10000, // Expect a heartbeat every 10 seconds from the server
-        heartbeatOutgoing: 10000, // Send a heartbeat every 10 seconds to the server
+        heartbeatIncoming: 30000, // Expect a heartbeat every 30 seconds from the server
+        heartbeatOutgoing: 30000, // Send a heartbeat every 30 seconds to the server
+        // connectionTimeout: 15000, //maximum 15 seconds to establish connection to the server
         reconnectDelay: 5000, // Reconnect after 5 seconds if disconnected
+        // discardWebsocketOnCommFailure: true,
         connectHeaders: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -133,9 +135,10 @@ const DashboardPage = () => {
         // Compliant brokers will terminate the connection after any error
         console.log("Broker reported error: " + frame.headers["message"]);
         console.log("Additional details: " + frame.body);
+        console.log("Frame json: " + JSON.stringify(frame));
         //atttempt to reconnect
         // stompClient.deactivate({ force: true });
-        connectWebSocket(currentUser);
+        // connectWebSocket(currentUser);
       };
 
       stompClient.onDisconnect = function () {
@@ -152,11 +155,16 @@ const DashboardPage = () => {
 
     function setupInactivityTimeout() {
       // inactivityTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>
-      if (inactivityTimeoutRef.current)
+      if (inactivityTimeoutRef.current) {
         clearTimeout(inactivityTimeoutRef.current);
+        console.log("Clear Inactivity Timeout");
+      }
 
       // Set user to "away" after 5 minutes of inactivity
       inactivityTimeoutRef.current = setTimeout(() => {
+        console.log(
+          `Inactivity Timeout; stomp ref: ${stompClientRef.current?.connected}, user ref: ${userRef.current?.status}, wasActive ref: ${wasActiveRef.current}`
+        );
         if (
           stompClientRef.current?.connected &&
           userRef.current?.status !== UserStatus.IDLE &&
@@ -173,6 +181,9 @@ const DashboardPage = () => {
     }
 
     function handleUserActivity() {
+      console.log(
+        `Handle user activity; stomp ref: ${stompClientRef.current?.connected}, user ref: ${userRef.current?.status}, wasActive ref: ${wasActiveRef.current}`
+      );
       if (
         stompClientRef.current?.connected &&
         userRef.current?.status === UserStatus.IDLE &&
@@ -197,6 +208,7 @@ const DashboardPage = () => {
             document.addEventListener(event, handleUserActivityTimeout);
           });
         });
+        setupInactivityTimeout();
       }
     });
 
@@ -271,7 +283,7 @@ const DashboardPage = () => {
         console.log("Update status received contains null value!");
         return;
       }
-      console.log("Updating user session data");
+      console.log("Updating user session data to " + statusUpdate.status);
       userRef.current.status = statusUpdate.status;
       setUserSessionCookie(userRef.current);
       console.log(userRef.current);
@@ -279,9 +291,7 @@ const DashboardPage = () => {
   };
 
   if (!stompClient || !currentUser) {
-    return (
-      <InitialLoading />
-    );
+    return <InitialLoading />;
   }
 
   return (
